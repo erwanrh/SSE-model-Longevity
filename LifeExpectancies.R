@@ -1,6 +1,4 @@
 #Compute Life Expectancies from Qx
-
-
 QX_model_period <- function(Age,Period,QxModel){  #Calcul des Qx en cohorte pour un age donn? ------------------------------------------------------------------------
   
   Qx_Period<- QxModel[as.numeric(row.names(QxModel))>=Age,colnames(QxModel)==Period]

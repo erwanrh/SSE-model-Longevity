@@ -1,29 +1,43 @@
+# LONGEVITY BASIS RISK - First evidence
+# Author:  (@axa.com), team
+# Version 1.0
+# Last update: 
+
+# Short description of the tool
+
+# Contains the following scripts:
+
+# Short description of sourced files
+
+
+####################################################################################-
+#--------------------------- FISRT STEP: INITIALIZE SCRIPT ----------------------------
+####################################################################################-
+
+rm(list=ls());gc() # clear the environment & release memory
+
+# Load libraries and source custom functions
 #install.packages('HMDHFDplus')
-rm(list=ls())
+require(HMDHFDplus)
+require(Matrix)
+require(RColorBrewer)
+require(reshape2)
+require(ggplot2)
+require(zoo)         
 
-library(HMDHFDplus)
-library(Matrix)
-library(gridExtra)
-library(RColorBrewer)
-library(reshape2)
-library(ggplot2)
-      
-library("zoo")         
-
-setwd('/Users/erwanrahis/Desktop//SSE_tests')
-
-
-#MORTSMOOTH 
+#Mort Smooth Package 
 pckg<-read.csv('pckSSE.csv')
 for (pk in pckg$HMDdata){
   source(paste0('MortalitySmooth-master/MortalitySmooth-master/R/',pk,'.R'))  
 }
 
-#MORTHUMP
+#Mort Hump Package
 source('SSE_fit.R')
 
 
-
+####################################################################################-
+#--------------------------- FISRT STEP: INITIALIZE SCRIPT ----------------------------
+####################################################################################-
 
 ## FIT DU MODELE SUR PLUSIEURS ANNEES 
 country_code <- 'FR'

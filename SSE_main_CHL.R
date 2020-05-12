@@ -1,34 +1,41 @@
-######## SCRIPT MODELE SSE ####### #
-# Camarda, 2016, Sum Of Smooth Exponentials
+######## SCRIPT MODEL SSE data for CHILE #######-
+# Author: Erwan Rahis (erwan.rahis@axa.com), GRM Life, Longevity Team
+# Version 1.0
+# Last update: 12/05/2020
 
-####1. INITIALISATION####
+# Script to fit a Sums Of Smooth Exponential model according to the paper "Sum Of Smooth Exponentials to decompose complex series of counts" 
+# Camarda (2016)
+
+
+
+####################################################################################-
+#---------------------------1. INITIALIZATION  ----------------------------
+####################################################################################-
+rm(list=ls()); gc(); #Clean environment
+
 #install.packages('HMDHFDplus')
-rm(list=ls())
-
 library(HMDHFDplus)
 library(Matrix)
 library(gridExtra)
 library(RColorBrewer)
 library(reshape2)
 library(ggplot2)
-      
-library("zoo")         
+library(zoo)         
 
-setwd('/Users/erwanrahis/Desktop//SSE_tests')
-
-
-#MORTSMOOTH 
+# Mortality Smoothing Package (required ro run Mort Hump functions 
 pckg<-read.csv('pckSSE.csv')
 for (pk in pckg$HMDdata){
   source(paste0('MortalitySmooth-master/MortalitySmooth-master/R/',pk,'.R'))  
 }
 
-#MORTHUMP
+# Mort Hump package 
 source('SSE_fit.R')
 
 
 
-####2. MODEL FITTING ####
+####################################################################################-
+#---------------------------2. MODEL FIT  ----------------------------
+####################################################################################-
 country_code <- 'CHL'
 year_min <- 2005
 year_max <- 2008
@@ -91,9 +98,11 @@ SSE_deathrates_female_df <-  t(data.frame(matrix(unlist(SSE_deathrates_female), 
 
 
 
-# 3. PLOTS ####
+####################################################################################-
+#---------------------------3. PLOTS  ----------------------------
+####################################################################################-
 
-# 3.i Plot des courbes de mortalité ####
+# 3.i Plot des courbes de mortalité  ----------------------------
 DeathRates_plot_males <- melt(SSE_deathrates_male_df,varnames = c('Age','Year'),value.name = 'coeff',)
 DeathRates_plot_females <- melt(SSE_deathrates_female_df,varnames = c('Age','Year'),value.name = 'coeff',)
 DeathRates_plot_males$gender <- 'M'
@@ -107,7 +116,7 @@ DeathRatesplot <- ggplot(DeathRates_plot)+geom_line(aes(x=Age, y=coeff, group = 
 ggsave(paste0('drplot_',country_code,'.pdf'),DeathRatesplot,width = 20, height = 12)
 
 
-# 3.ii Plot des coefficients ####
+# 3.ii Plot des coefficients  ----------------------------
 COMP1 <- paste0('X',1:2)
 COMP2 <- paste0('X',3:27)
 COMP3 <- paste0('X',28:52)
@@ -128,7 +137,7 @@ ggsave(paste0('coefplots_',country_code,'.pdf'),coefplots,width = 20, height = 1
 
 
 
-#3.iii Plot des muhat ####
+#3.iii Plot des muhat  ----------------------------
 png(paste0('TestSSE_outputs_',country_code,'.png'), units="in", width=10, height=9, res=300 )
 
 plot(SSE_males$mhat$mhat3[,1]+SSE_males$mhat$mhat1[,1]+SSE_males$mhat$mhat2[,1],col='red',log='y',type='l',ylim = c(0.00001,1),ylab = 'mhat',xlab='age')
@@ -142,7 +151,7 @@ title(paste0('Components of SSE model - ',as.character(year),' - ', country_code
 dev.off()
 
 
-# 3.iv Graph des élements des B-splines ####
+# 3.iv Graph des élements des B-splines  ----------------------------
 splines_plot <- SSE_splines_male
 splines_plot [splines_plot$splinenb %in% 1:2, 'comp']<-'c1'
 splines_plot[splines_plot$splinenb %in% 3:27, 'comp']<-'c2'
@@ -152,7 +161,7 @@ splines_ggplot <- ggplot(splines_plot,aes(x=age, y=splinevalue, color=year, grou
 ggsave(paste0('spline_comp_',country_code,'.pdf'),plot = splines_ggplot,width = 15, height = 15)
 
 
-# 3.v Graph de tous les coefficients pour comparaison avec les splines ####
+# 3.v Graph de tous les coefficients pour comparaison avec les splines  ----------------------------
 coefs_plots_52gridM <- ggplot(Coeff_plot_males,aes(x=Year, y=coeff, color=year, group=year))+ geom_line() + facet_wrap(.~Coeff.num) + ggtitle (paste0('Coefficients for splines Males - ', country_code))
 ggsave(paste0('coeffs_52grid_M',country_code,'.pdf'),plot = coefs_plots_52gridM,width = 15, height = 15) 
 
@@ -160,10 +169,11 @@ coefs_plots_52gridF <- ggplot(Coeff_plot_females,aes(x=Year, y=coeff, color=year
 ggsave(paste0('coeffs_52grid_F',country_code,'.pdf'),plot = coefs_plots_52gridF,width = 15, height = 15) 
 
 
+####################################################################################-
+#---------------------------4. SPLINES  ----------------------------
+####################################################################################-
 
-# 4.  SPLINES ####
-
-# 4.i Egalite des splines ####
+# 4.i Egalite des splines  ----------------------------
 SSE_splines_AllGenders <- merge(SSE_splines_female, SSE_splines_male,by = c('age','splinenb','year'), all=T )
 SSE_splines_AllGenders$Equal <- SSE_splines_AllGenders$splinevalue.x== SSE_splines_AllGenders$splinevalue.y
 if (sum(SSE_splines_AllGenders$Equal) != nrow(SSE_splines_AllGenders)){
@@ -172,7 +182,7 @@ if (sum(SSE_splines_AllGenders$Equal) != nrow(SSE_splines_AllGenders)){
 
 
 
-# 4.ii Déplacement des splines ####
+# 4.ii Déplacement des splines  ----------------------------
 
 splines_df <- SSE_splines_male[SSE_splines_male$year == 2007,]
 splines_df_cast <- dcast(splines_df, age ~ splinenb,value.var = 'splinevalue')
@@ -196,8 +206,10 @@ ggplot(max_index) + geom_point(aes(x=ArgMax, y=Max,color=comp,shape= comp, size=
   scale_x_continuous(breaks = seq(0,110,5))
 
 
+####################################################################################-
+#---------------------------5. MUHAT COMPUTATION  ----------------------------
+####################################################################################-
 
-# 5. CALCUL DES MUHAT #####
 plot(SSE_males$data$m,col='pink',type='o',log='y',ylim = c(0.00001,1))
 
 lines(exp(SSE_males$XX$X1%*%(coef(SSE_males)[1:2])),col='red')
@@ -245,8 +257,10 @@ for (i in c(1992,1996,2000,2005,2007)){
 write.csv(LE_CHL_df,'lechl.csv')
 
 
+####################################################################################-
+#--------------------------7. SENSITIVITES  ----------------------------
+####################################################################################-
 
-# 7. SENSIBILITES ####
 splines <- cbind(SSE_males$XX$X1,SSE_males$XX$X2,SSE_males$XX$X3) #Les splines ne sont jamais modifiées
 coefs <- matrix(rep(t(SSE_males$coef),times=111),nrow =  111,byrow = T)
 eta <- splines*coefs
@@ -258,7 +272,7 @@ plot(mHat,type='l',log='y')
 axis(1, at=seq(0,110,5))
 
 
-# 7.i Modification du coefficient 2 ####
+# 7.i Modification du coefficient 2  ----------------------------
 coeff2_lifeExp <- data.frame()
 Qx_Modified_list <- {}
 
@@ -277,7 +291,7 @@ for (x in seq(0,6,1)){
   coeff2_lifeExp[as.character(x),'Alpha2']<- x
 }
 
-# 7.ii Dataframe des Qx pour chaque valeur de alpha 2 ####
+# 7.ii Dataframe des Qx pour chaque valeur de alpha 2  ----------------------------
 Qx_Modified_df <- data.frame(matrix(unlist(Qx_Modified_list), ncol=length(Qx_Modified_list), byrow=F))
 colnames(Qx_Modified_df) <- names(Qx_Modified_list)
 Qx_Modified_df$Age <- 0:110
@@ -287,7 +301,7 @@ ggplot(Qx_Modified_df) + geom_line( aes(x = Age, y=Qx, group = Alpha, color= Alp
   scale_x_continuous(breaks= seq(0,110,10))
 
 
-# 7.iii Plot des espérances de vie en fonction du paramètre alpha 2 ####
+# 7.iii Plot des espérances de vie en fonction du paramètre alpha 2  ----------------------------
 plot(coeff2_lifeExp$Alpha2, coeff2_lifeExp$LifeEx, xlab = 'Alpha2', ylab='Life Expectancy')
 
 #Espérance de vie avant modificiations
@@ -326,7 +340,7 @@ title('Exposition en fonction de l‘âge')
 
 
 
-# 7.iv Sensibilité des coeffs 2 a 2 ####
+# 7.iv Sensibilité des coeffs 2 a 2  ----------------------------
 Coefficient_variation <- data.frame()
 for (coeff in row.names(SSE_coeffcients_males_df)){
   
@@ -376,7 +390,7 @@ ggplot(Qx_Modified_df2) + geom_line( aes(x = Age, y=Qx, group = ModifiedCoeffs, 
 
 
 
-# 7.v Sensibilite 1 a 1 ####
+# 7.v Sensibilite 1 a 1  ----------------------------
 
 Study_Coeff2_df <- data.frame()
 Qx_Modified_list3 <- {}
@@ -402,7 +416,7 @@ for (i2 in 1:52){
 }
 
 
-# 7.vi Dataframe des Qx pour chaque MODIFICATION ####
+# 7.vi Dataframe des Qx pour chaque MODIFICATION  ----------------------------
 Qx_Modified_df3 <- data.frame(matrix(unlist(Qx_Modified_list3), ncol=length(Qx_Modified_list3), byrow=F))
 colnames(Qx_Modified_df3) <- names(Qx_Modified_list3)
 Qx_Modified_df3$Age <- 0:110
@@ -418,10 +432,10 @@ write.csv2(Study_Coeff2_df, 'studycoeff11.csv')
 
 
 
-
-#8. SENSIBILITE DES COMPOSANTES ####
-#Admettons que nous gardons la bosse des accidents constantes car nous n'avons aucune idée sur son évolution. 
-#Nous faisons évoluer la mortalité infantile.
+####################################################################################-
+#---------------------------8. COMPONENT SENTIVITIES  ----------------------------
+####################################################################################-
+# Let's suppose the accident hump constant considering its unknown evolution. Let's modify infant mortality.
 
 plot(SSE_males$data$m,col='pink',type='o',log='y',ylim = c(0.00001,1))
 lines(exp(SSE_males$XX$X1%*%(coef(SSE_males)[1:2])),col='red')
