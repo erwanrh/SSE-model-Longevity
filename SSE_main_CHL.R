@@ -24,7 +24,7 @@ library(zoo)
 
 # Mortality Smoothing Package (required ro run Mort Hump functions 
 pckg<-read.csv('pckSSE.csv')
-for (pk in pckg$HMDdata){
+for (pk in pckg$ï..HMDdata){
   source(paste0('MortalitySmooth-master/MortalitySmooth-master/R/',pk,'.R'))  
 }
 
