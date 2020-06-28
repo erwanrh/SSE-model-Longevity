@@ -155,10 +155,6 @@ sse.fit <- function(data, lambda.hump = 1, lambda.sen = 10, x.hump = 35, x.sen =
   xmax2 <- xr2 + 0.01 * (xr2 - xl2)
   xmin2 <- xl2 - 0.01 * (xr2 - xl2)
   
-  print(x)
-  print(paste0('xMin2 = ',xmin2))
-  print(paste0('xMax2 = ',xmax2))
-  print(paste0('deg2 = ',deg2))
   
   B2 <- MortSmooth_bbase(x, xmin2, xmax2, deg2, 3)
   nb2 <- ncol(B2)
@@ -173,10 +169,7 @@ sse.fit <- function(data, lambda.hump = 1, lambda.sen = 10, x.hump = 35, x.sen =
   xmax3 <- xr3 + 0.01 * (xr3 - xl3)
   xmin3 <- xl3 - 0.01 * (xr3 - xl3)
   
-  print(x3)
-  print(paste0('xMin3 = ',xmin3))
-  print(paste0('xMax3 = ',xmax3))
-  print(paste0('deg3 = ',deg3))
+
   B3 <- MortSmooth_bbase(x3, xmin3, xmax3, deg3, 3)
   nb3 <- ncol(B3)
   ## difference matrices
@@ -350,8 +343,7 @@ sse.fit <- function(data, lambda.hump = 1, lambda.sen = 10, x.hump = 35, x.sen =
     ## convergence criterion for the concaveness
     conv.con <- all(W2mon.old==W2mon,
                     W3con.old==W3con)
-   #DEBUGGGGGG
-    #print(it)
+
     
     dif.coef <- max(abs(coef.old - coef))/max(abs(coef))
     

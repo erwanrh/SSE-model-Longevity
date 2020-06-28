@@ -444,7 +444,7 @@ lines(exp(SSE_males$XX$X3%*%(coef(SSE_males)[28:52])),col='blue')
 
 hump2 <- melt(exp(SSE_males$XX$X3%*%(SSE_coeffcients_males_df[28:52,])),varnames = c('Age','Year'),value.name = 'm')
 hump2$Comp <- '3'
-ggplot(hump) + geom_line( aes(x=Age, y=m, group=Year, color=Year))+scale_y_continuous(trans='log10') 
+ggplot(hump2) + geom_line( aes(x=Age, y=m, group=Year, color=Year))+scale_y_continuous(trans='log10') 
 
 infant <- melt(exp(SSE_males$XX$X1%*%(SSE_coeffcients_males_df[1:2,])),varnames = c('Age','Year'),value.name = 'm')
 infant$Comp <- '1'
@@ -454,15 +454,15 @@ senescent <- melt(exp(SSE_males$XX$X2%*%(SSE_coeffcients_males_df[3:27,])),varna
 senescent$Comp <- '2'
 ggplot(senescent) + geom_line( aes(x=Age, y=m, group=Year, color=Year))+scale_y_continuous(trans='log10') 
 
-MU <- hump
-MU$m <- hump$m+infant$m+senescent$m
+MU <- hump2
+MU$m <- hump2$m+infant$m+senescent$m
 MU$Comp <-'All'
 ggplot(MU) + geom_line( aes(x=Age, y=m, group=Year, color=Year))+scale_y_continuous(trans='log10') 
 
-ALL_plot_df <- rbind(hump, infant, senescent, MU)
+ALL_plot_df <- rbind(hump2, infant, senescent, MU)
 ALL_plot_df$Year <-as.character(ALL_plot_df$Year)
 
-ggplot(subset(ALL_plot_df, Year %in% c(1996,2000))) + 
+ggplot(subset(ALL_plot_df, Year %in% c(1996,2000, 2005,  2007))) + 
   geom_line( aes(x=Age, y=m, group= interaction(Year,Comp), color=Comp,linetype=Year))+
   scale_y_continuous(trans='log10',limits = c(1e-5,1),name = 'μ')  +ggtitle('SSE Composantes')
 
