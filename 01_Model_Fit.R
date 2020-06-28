@@ -79,3 +79,4 @@ SSE_deathrates_female_df <-  t(data.frame(matrix(unlist(SSE_deathrates_female), 
 SSE_data_male_df <- t(data.frame(matrix(unlist(SSE_data_male), nrow=length(SSE_data_male), byrow=T),row.names = names(SSE_data_male)))
 SSE_data_female_df <- t(data.frame(matrix(unlist(SSE_data_female), nrow=length(SSE_data_female), byrow=T),row.names = names(SSE_data_female)))
 
+row.names(SSE_deathrates_male_df) <- 0:110
