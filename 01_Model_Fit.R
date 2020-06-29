@@ -26,10 +26,10 @@ SSE_data_female <- list()
 
 
 #FIT du modèle sur chaque année entre 1900 et 2017
-for (year in 1960:2017){
+for (year in seq(1960, 2017, 3)){
   print(paste0('Fitting year : ', year, '...'), quote = FALSE) 
-  Data_males <- HMD2MH(country=country_code,year=year, sex='males',path='Data_France',xtra=TRUE)
-  Data_females <- HMD2MH(country=country_code,year=year, sex='females',path='Data_France',xtra=TRUE)
+  Data_males <- HMD2MH(country=country_code,year=year, sex='males',path='Data',xtra=TRUE)
+  Data_females <- HMD2MH(country=country_code,year=year, sex='females',path='Data',xtra=TRUE)
   # Expo
   Data_males$n[ Data_males$n==0] <-0.01
   Data_females$n[ Data_females$n==0] <-0.01
@@ -80,3 +80,4 @@ SSE_data_male_df <- t(data.frame(matrix(unlist(SSE_data_male), nrow=length(SSE_d
 SSE_data_female_df <- t(data.frame(matrix(unlist(SSE_data_female), nrow=length(SSE_data_female), byrow=T),row.names = names(SSE_data_female)))
 
 row.names(SSE_deathrates_male_df) <- 0:110
+row.names(SSE_deathrates_female_df) <- 0:110

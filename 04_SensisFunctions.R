@@ -205,7 +205,7 @@ compute_delta_Ex_crossedsensis <- function (period1 = 2000, period2= 2017){
   Fitted_DataFrame_SensisInfant <- Fitted_sensis_listInfant[['df_sensis']]
  
   
-  LE_base <- LE_period_Model(QxModel = Fitted_DataFrame_base,Age =  0, Period = 'FittedCurve')
+  LE_base <- LE_period_Model(QxModel = SSE_deathrates_male_df,Age =  0, Period = period1)
   LE_after <- LE_period_Model(QxModel = SSE_deathrates_male_df,Age =  0, Period = period2)
   
   LE_sensisHump <- LE_period_Model(QxModel = Fitted_DataFrame_SensisHump,Age =  0, Period = 'FittedCurve')
@@ -215,7 +215,7 @@ compute_delta_Ex_crossedsensis <- function (period1 = 2000, period2= 2017){
   LE_delta_crossed <- as.data.frame(rbind(LE_sensisHump, LE_sensisSenescent, LE_sensisInfant))
   LE_delta_crossed$Base <- - LE_base
   
-  rowSums(LE_delta_crossed)/LE_after
+  abs(rowSums(LE_delta_crossed)/(LE_after - LE_base))
 }
 
 

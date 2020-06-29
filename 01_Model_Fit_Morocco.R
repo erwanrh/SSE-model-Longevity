@@ -11,10 +11,15 @@
 #---------------------------MODEL FIT MOROCCO ----------------------------
 ####################################################################################-
 
-Data_MAR <- read.csv2('Data_France/MAR/alldata_MAR.csv')
-  
-ggplot(Data_MAR) + geom_line(aes(x= age, y = qx, group=year, color=year)) + facet_wrap(.~sex) + 
+Data_qx_MAR <- read.csv('Data_France/MAR/WHO_DATA/Morocco_plot_qx_polyfit.csv', row.names = 1)
+Data_dx_MAR <- read.csv('Data_France/MAR/WHO_DATA/Morocco_plot_deaths_polyfit.csv', row.names = 1)
+
+ggplot(Data_dx_MAR) + geom_line(aes(x= Age, y = qx_male, group=year, color=year)) + 
   scale_y_continuous(trans = 'log10')
+
+
+
+
 
 year_ <- 2016
 data_temp <- subset(Data_MAR, sex== 'M' & year == year_, select = c('age', 'deaths', 'expo', 'qx') )

@@ -22,13 +22,13 @@ library(ggplot2)
 library(zoo)         
 
 # Mortality Smoothing Package (required ro run Mort Hump functions 
-pckg<-read.csv('pckSSE.csv')
+pckg<-read.csv('MortalitySmooth-master/pckSSE.csv')
 for (pk in pckg$HMDdata){
   source(paste0('MortalitySmooth-master/MortalitySmooth-master/R/',pk,'.R'))  
 }
 
 # Mort Hump package 
-source('SSE_fit.R')
+source('MortalitySmooth-master/SSE_fit.R')
 #Indicators functions
 source('00_Functions_Calc.R')
 
@@ -85,19 +85,34 @@ ggplot(max_index) + geom_point(aes(x=ArgMax, y=Max,color=comp,shape= comp, size=
 #---------------------------5. MUHAT COMPUTATION  ----------------------------
 ####################################################################################-
 source('05_Functions_Plots.R')
-
+source('06_Functions_Plots_Females.R')
 plot_allyears_senescent()
 plot_allyears_hump()
-plot_allyears_infant()
-plot_allyears_qx()
+plot_allyears_infant()+  scale_color_gradientn(colours = rainbow(5))
 
-plot_selectedyears_allComp(c(1960,2017))
+female_infant <- plot_allyears_infant() + ggtitle('Female') + theme(legend.position = 'none')
+female_senescent <- plot_allyears_senescent() + theme(legend.position = 'none')
+female_hump <- plot_allyears_hump()+ theme(legend.position = 'none')
+gridFemale <- grid.arrange(female_infant, female_senescent, female_hump, ncol=1)
 
+male_infant <- plot_allyears_infant() + ggtitle('Male') + theme(legend.position = 'none')
+male_senescent <- plot_allyears_senescent() 
+male_hump <- plot_allyears_hump()+ theme(legend.position = 'none')
+gridMale <- grid.arrange(male_infant, male_senescent, male_hump, ncol=1)
+
+grid.arrange(gridFemale, gridMale, nrow =1)
+ 
+plot_selectedyears_allComp(c(1965,1966))
+
+grid.arrange(female_qx +  scale_color_gradientn(colours = rainbow(5)),
+             male_qx +  scale_color_gradientn(colours = rainbow(5)))
 ## All plots
 grid.arrange(plot_allyears_senescent(), plot_allyears_hump(),plot_allyears_infant(), plot_allyears_qx())
 
 #SUrvival function plot
 plot_allyears_lx()
+
+plot_allyears_qx()
 
 
 
@@ -165,14 +180,18 @@ sensis_crossed_df<- data.frame()
 for (year in as.numeric(colnames(SSE_deathrates_male_df)[-1])){
   sensis_crossed_df <- rbind(sensis_crossed_df,compute_delta_Ex_crossedsensis(period1 = year-1, period2 = year))
 }
-sensis_crossed_df <- sensis_crossed_df*10
+sensis_crossed_df <- sensis_crossed_df*100
 sensis_crossed_df$year <- as.numeric(colnames(SSE_deathrates_male_df)[-1])
 colnames(sensis_crossed_df) <- c('Hump', 'Senescent', 'Infant', 'year')
+colnames(sensis_crossed_df) <- c('val', 'year')
 
 write.csv2(sensis_crossed_df, 'sensis_ex_crossed.csv')
 
 sensis_crossed_plot <- melt(sensis_crossed_df, id.vars = 'year' )
 
-ggplot(sensis_crossed_plot) + geom_line(aes(x= year, y= value, group = variable, color= variable)) + facet_wrap(~ variable)
+ggplot(subset(sensis_crossed_plot,  variable != 'Senescent')) + geom_line(aes(x= year, y= value, group = variable, color= variable)) #+ facet_wrap(~ variable)
+ggplot(sensis_crossed_df) + geom_line(aes(x= year, y= val)) #+ facet_wrap(~ variable)
 
+mean(sensis_crossed_df$val)
 
+plot_selectedyears_allComp(c(1965,1966))

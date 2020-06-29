@@ -35,9 +35,9 @@ plot_allyears_infant <- function(){
     
   infant <- melt(infant_qx,varnames = c('Age','Year'),value.name = 'm')
   infant$Comp <- '1'
-  ggplot(infant) + geom_line( aes(x=Age, y=m, group=Year, color=Year))+scale_y_continuous(trans='log10') +
-    annotation_custom(tableGrob(round(first_infant_rate, 4),rows = names(first_infant_rate), cols = ('q0') , theme=ttheme_default(base_size = 7)), 
-                      xmin=80, xmax=110)
+  ggplot(infant) + geom_line( aes(x=Age, y=m, group=Year, color=Year))+scale_y_continuous(trans='log10') 
+    #annotation_custom(tableGrob(round(first_infant_rate, 4),rows = names(first_infant_rate), cols = ('q0') , theme=ttheme_default(base_size = 7)), 
+     #                 xmin=80, xmax=110)
               
   }
 
@@ -57,8 +57,10 @@ plot_allyears_qx <- function(){
   MU <- hump
   MU$m <- hump$m+infant$m+senescent$m
   MU$Comp <-'All'
-  ggplot(MU) + geom_line( aes(x=Age, y=m, group=Year, color=Year))+scale_y_continuous(trans='log10') 
-}
+  ggplot(MU) + geom_line( aes(x=Age, y=m, group=Year, color=Year))+scale_y_continuous(trans='log10') +
+    scale_color_gradientn(colours = rainbow(5))
+
+  }
 
 plot_selectedyears_allComp <- function(Years){
   hump <- melt(exp(SSE_males$XX$X3%*%(SSE_coeffcients_males_df[28:52,])),varnames = c('Age','Year'),value.name = 'm')
