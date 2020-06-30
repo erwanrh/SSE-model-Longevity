@@ -213,9 +213,9 @@ compute_delta_Ex_crossedsensis <- function (period1 = 2000, period2= 2017){
   LE_sensisInfant <- LE_period_Model(QxModel = Fitted_DataFrame_SensisInfant,Age =  0, Period = 'FittedCurve')
   
   LE_delta_crossed <- as.data.frame(rbind(LE_sensisHump, LE_sensisSenescent, LE_sensisInfant))
-  LE_delta_crossed$Base <- - LE_base
   
-  abs(rowSums(LE_delta_crossed)/(LE_after - LE_base))
+  
+  cbind(LE_delta_crossed, LE_base, LE_after)
 }
 
 

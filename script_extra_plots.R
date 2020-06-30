@@ -20,12 +20,18 @@ dplot <- ggplot(All_data_both) + geom_line(aes(x= x, y=d, group = year, color = 
   xlab('')
 nplot <- ggplot(All_data_both) + geom_line(aes(x= x, y=n, group = year, color = year)) + ggtitle('Expositions') + facet_wrap(~sex)+
   xlab('age')
-mplot <- ggplot(All_data_both) + geom_line(aes(x= x, y=m, group = year, color = year)) + ggtitle('Expositions') + facet_wrap(~sex)+
-  xlab('age')
+mplot <- ggplot(All_data_both) + geom_line(aes(x= x, y=m, group = year, color = year), na.rm = T) + ggtitle('Taux de mortalité') + facet_wrap(~sex)+
+  xlab('age')+ scale_y_continuous(trans = 'log10') +
+  annotate("rect", xmin=13, xmax=30, ymin=5e-5 , ymax=4e-03, alpha=0.5,  fill="#F7DC6F")+
+  annotate("rect", xmin=-1, xmax=10, ymin=2e-05, ymax= 5e-02, alpha=0.5, fill='#BB8FCE')
 
+
+mplot
 grid.arrange(dplot, nplot)
 
-
+ratedhmd <- dcast(subset(All_data_both, sex=='M'), formula = x ~ year, value.var = 'm')
+ratedhmd[ratedhmd == 0] <- NA
+All_data_both[is.na(All_data_both$m) |  All_data_both$m== 0, 'm'] <- 1
 # Tableau d'espérances de vie ------------------------------
 LE_table_latex1 <- cbind(rbind(LE_period_Model(Age = 0, Period = 1960, dcast(All_data_male,value.var = 'm', x ~ year)),
                                LE_period_Model(Age = 0, Period = 2017, dcast(All_data_male,value.var = 'm', x ~ year))), 

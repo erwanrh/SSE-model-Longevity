@@ -132,9 +132,6 @@ plot_allcompRawData(1960)
 
 #ggsave('plot_allfittedComp.pdf', plot_allFittedcomp, height = 6, width =7 )
 
-####
-
-
 
 #### SENSITIVITY ON COMPONENTS
 
@@ -182,7 +179,7 @@ for (year in as.numeric(colnames(SSE_deathrates_male_df)[-1])){
 }
 sensis_crossed_df <- sensis_crossed_df*100
 sensis_crossed_df$year <- as.numeric(colnames(SSE_deathrates_male_df)[-1])
-colnames(sensis_crossed_df) <- c('Hump', 'Senescent', 'Infant', 'year')
+colnames(sensis_crossed_df) <- c('Hump', 'Senescent', 'Infant','LE_before','LE_after', 'year')
 colnames(sensis_crossed_df) <- c('val', 'year')
 
 write.csv2(sensis_crossed_df, 'sensis_ex_crossed.csv')
