@@ -100,12 +100,12 @@ plot_allcompRawData <- function(period=2017){
 }
 
 plot_allyears_lx <- function(){
-  row.names(SSE_deathrates_female_df) <- 0:110
+  row.names(SSE_deathrates_male_df) <- 0:110
   
-  lx <- compute_lx_period(SSE_deathrates_female_df, start.age = 0)
+  lx <- compute_lx_period(SSE_deathrates_male_df, start.age = 0)
   lx_plot <- melt(lx, varnames = c('Age', 'Period'), value.name = 'lx')
   
-  entropy <- compute_entropy_period(SSE_deathrates_female_df, start.age = 0)
+  entropy <- compute_entropy_period(SSE_deathrates_male_df, start.age = 0)
   
   
  p <- ggplot(lx_plot) + geom_line(aes(x=Age, y = lx, group = Period, color = Period)) +
@@ -118,3 +118,20 @@ plot_allyears_lx <- function(){
 }
 
 
+plot_selectyears_lx <- function(years){
+  
+  lx <- compute_lx_period(SSE_deathrates_male_df, start.age = 0)
+  lx_plot <- melt(lx, varnames = c('Age', 'Period'), value.name = 'lx')
+  
+  entropy <- compute_entropy_period(SSE_deathrates_male_df[,colnames(SSE_deathrates_male_df) %in% years], start.age = 0)
+  
+  
+  p <- ggplot(subset(lx_plot, Period %in% years)) + geom_line(aes(x=Age, y = lx, group = as.character(Period), color = as.character(Period))) +
+    annotation_custom(tableGrob(cbind(as.character(entropy[,1]), round(entropy[,2]*100,3)), 
+                                rows = NULL, theme=ttheme_default(base_size = 7), cols = c('Period', 'Entropy')),
+                      xmin=0, xmax=30, ymin=20000, ymax=25000) +
+    ggtitle('Survival curves and entropy on fitted values') +
+    scale_color_discrete(name='Period')
+  
+  p 
+}

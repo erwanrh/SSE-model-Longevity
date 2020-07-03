@@ -215,7 +215,7 @@ compute_delta_Ex_crossedsensis <- function (period1 = 2000, period2= 2017){
   LE_delta_crossed <- as.data.frame(rbind(LE_sensisHump, LE_sensisSenescent, LE_sensisInfant))
   
   
-  cbind(LE_delta_crossed, LE_base, LE_after)
+  cbind( LE_base, t(LE_delta_crossed), LE_after)
 }
 
 

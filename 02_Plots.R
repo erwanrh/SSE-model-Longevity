@@ -23,7 +23,7 @@ DeathRates_plot_females$gender <- 'F'
 DeathRates_plot <- rbind(DeathRates_plot_females,DeathRates_plot_males)
 DeathRates_plot$Age <- as.numeric(DeathRates_plot$Age)
 
-DeathRatesplot <- ggplot(DeathRates_plot)+geom_line(aes(x=Age, y=coeff, group = Year,color=Year))+ ggtitle(paste0('SSE Mortality Rates - ',country_code)) +facet_wrap(gender~.,scales = 'free')+
+DeathRatesplot <- ggplot(DeathRates_plot)+geom_line(aes(x=Age, y=coeff, group = Year,color=Year))+ ggtitle(paste0('SSE Mortality Rates - ', country_code)) +facet_wrap(gender~.,scales = 'free')+
   scale_y_continuous(trans='log2') + scale_x_continuous(breaks = seq(0,110,5), labels= seq(0,110,5) )
 
 ggsave(paste0('drplot_',country_code,'.pdf'),DeathRatesplot,width = 20, height = 12)
