@@ -83,7 +83,7 @@ plot_qx_sensis <- function (sensis_infant=0, sensis_hump=0, sensis_senescent=0, 
   
   p<- ggplot(Final_DF_plot) + geom_line(aes(x = Age, y = qx, group = interaction(Sensis, Component), color = Component, linetype = Sensis)) +
     scale_y_continuous(trans='log10',limits = c(1e-5,1),name = 'μ') +
-    ggtitle(paste0('Components, Data and Fitted Curve for France ', period, ' - SSE'))
+    ggtitle(paste0('Components, Data and Fitted Curve for Morocco ', period, ' - SSE'))
   
   p
 }
@@ -241,7 +241,7 @@ plot_qx_crossedsensis <- function (period1 = 2000, period2 = 2017, component){
   
   p<- ggplot(Final_DF_plot) + geom_line(aes(x = Age, y = qx, group = interaction(Sensis, Component), color = Component, linetype = Sensis)) +
     scale_y_continuous(trans='log10',limits = c(1e-5,1),name = 'μ') +
-    ggtitle(paste0('Components, Data and Fitted Curve for France ', period1, ' - SSE'))
+    ggtitle(paste0('Components, Data and Fitted Curve for Morocco ', period1, ' - SSE'))
   
   p
 }

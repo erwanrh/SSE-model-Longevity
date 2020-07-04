@@ -74,7 +74,7 @@ dev.off()
 # Plot all years all components all sex on ONE PAGE
 female_infant <- plot_allyears_infant() + ggtitle('Female') + theme(legend.position = 'none')
 female_senescent <- plot_allyears_senescent() + theme(legend.position = 'none')
-female_hump <- plot_allyears_hump()+ theme(legend.position = 'none')
+female_hump <- plot_allyears_hump()#+ theme(legend.position = 'none')
 gridFemale <- grid.arrange(female_infant, female_senescent, female_hump, ncol=1)
 
 male_infant <- plot_allyears_infant() + ggtitle('Male') + theme(legend.position = 'none')
@@ -89,7 +89,7 @@ dev.off()
 
 
 #test PLOT SEVERAL YAERS ALL COMPONENTS
-plot_selectedyears_allComp(c(2000,2016))
+plot_selectedyears_allComp(c(2004,2005, 2006))
 
 
 
@@ -139,6 +139,8 @@ plot_lx_sensis(sensis_infant =  100, sensis_hump = 0.1, sensis_senescent = 0)
 plot_qx_sensis(sensis_infant =  100, period = 2015)
 
 
+source('04_SensisFunctions_Morocco.R')
+source('04_SensisFunctions_Females_Morocco.R')
 #Dataframe des sensibilités d'ex
 sensis_ex_df <- data.frame()
 sensis_entropy_df <- data.frame()
@@ -196,45 +198,69 @@ for (year in as.numeric(colnames(SSE_deathrates_male_df)[-1])){
 
 
 sensis_crossed_var_df <- (sensis_crossed_df[, c('LE_sensisHump','LE_sensisSenescent','LE_sensisInfant')] - sensis_crossed_df$LE_base)*12
-sensis_crossed_var_df <- sensis_crossed_var_df / ((sensis_crossed_df$LE_after - sensis_crossed_df$LE_base)*12)
 sensis_crossed_var_df$year <- sensis_crossed_df$year
 sensis_crossed_var_df$LE_var <- (sensis_crossed_df$LE_after - sensis_crossed_df$LE_base)*12
 
 
-#Corrélations ----------
+#Plot crossed sensis ----------
+sensis_crossed_plot_m  <- melt(sensis_crossed_var_df, id.vars = 'year' )
+sensis_crossed_plot_m$sex <- 'M'
 
-sensis_crossed_plot_5mean_m  <- melt(aggregate(sensis_crossed_var_df, list(rep(1:(nrow(sensis_crossed_var_df)%/%5+1),each=5,len=nrow(sensis_crossed_var_df))),mean)[-1], id.vars = 'year' )
-sensis_crossed_plot_5mean_m$sex <- 'M'
-
-sensis_crossed_plot_5mean_f  <- melt(aggregate(sensis_crossed_var_df, list(rep(1:(nrow(sensis_crossed_var_df)%/%5+1),each=5,len=nrow(sensis_crossed_var_df))),mean)[-1], id.vars = 'year' )
-sensis_crossed_plot_5mean_f$sex <- 'F'
+sensis_crossed_plot_f  <- melt(sensis_crossed_var_df, id.vars = 'year' )
+sensis_crossed_plot_f$sex <- 'F'
 
 
-sensis_crossed_plot <- melt(sensis_crossed_var_df, id.vars = 'year' )
-sensis_crossed_plot_5mean <- rbind(sensis_crossed_plot_5mean_f, sensis_crossed_plot_5mean_m)
+sensis_crossed_plot <- rbind(sensis_crossed_plot_f, sensis_crossed_plot_m)
 
-p1 <- ggplot(subset(sensis_crossed_plot,  variable != 'Senescent')) + geom_line(aes(x= year, y= value, group = variable, color= variable)) + #facet_wrap(~ sex,nrow=2) +
-  ggtitle('Component Yearly Ex improvement ') + ylab('Absolute Ex (months)')
+p2 <- ggplot(sensis_crossed_plot) + geom_line(aes(x= year, y= value, group = variable, color= variable, linetype= variable)) +  facet_wrap(~ sex, nrow=2)+
+  ggtitle('Component Yearly Ex Improvements')+ ylab('LE improvement (months)') +
+  scale_linetype_manual('LE Improvement',values = c(1,1,1,2), labels = c('Hump', 'Senescent', 'Infant', 'Total'))+
+  scale_color_discrete('LE Improvement',  labels = c('Hump', 'Senescent', 'Infant', 'Total'))
 
-p2 <- ggplot(sensis_crossed_plot_5mean) + geom_line(aes(x= year, y= value, group = variable, color= variable)) +  facet_wrap(~ sex, nrow=2)+
-  ggtitle('Component 5Y Ex Improvements')+ ylab('Absolute Ex (months)')
-
-png('comp2_imp_Maroc.png', width = 5000, height = 4000, res = 500)
-p1
+png('comp_imp_MAR.png', width = 5000, height = 4000, res = 500)
+p2
 dev.off()
+
+
+
 
 #write.csv(sensis_crossed_df, 'sensis_ex_crossed.csv')
 #ggplot(sensis_crossed_df) + geom_line(aes(x= year, y= val)) #+ facet_wrap(~ variable)
 
-plot_selectedyears_allComp(c(1965,1966))
-plot_qx_crossedsensis(1965,1966,component = 'senescent')
-
-imp_corr <- melt(cor(dcast(subset(sensis_crossed_plot), formula = year ~ variable, value.var = 'value')[,-1]))
-corr <- ggplot(data = imp_corr, aes(x=Var1, y=Var2, fill=value)) + 
-  geom_tile()  +
-  geom_text(aes(Var2, Var1, label = round(value,3)), color = "white", size = 5) 
-
-
-png('corrplot.png', height=800, width = 1000, res=150)
-corr
+png('comp_evolution_graph_MAR.png',  width = 5000, height = 3000, res = 600)
+plot_selectedyears_allComp(c(2000,2016)) + ggtitle('Composantes SSE Maroc en 2000 et 2016') + 
+  scale_color_discrete('Component', labels=c('Infant', 'Senescent', 'Hump', 'All'))
 dev.off()
+
+plot_qx_crossedsensis(2000,2016,component = 'senescent')
+
+
+imp_corr <- melt(cor(dcast(subset(sensis_crossed_plot, sex=='M'), formula = year ~ variable, value.var = 'value')[,c(2,3,4)]))
+corr_M <- ggplot(data = imp_corr, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile()  +
+  scale_fill_gradient2(midpoint = 0, low = "#52BE80", mid = "white",
+                       high = "#03A9F4", space = "Lab" )+
+  scale_y_discrete('',labels=c('Infant improvements','Senescent improvements','Hump improvements'))+
+  scale_x_discrete('',labels=c('Infant improvements','Senescent improvements','Hump improvements'))+
+  geom_text(aes(Var2, Var1, label = round(value,3)), color = "#5D6D7E", size = 5) + ggtitle('Male')
+
+imp_corr <- rbind(melt(cor(dcast(subset(sensis_crossed_plot, sex=='F'), formula = year ~ variable, value.var = 'value')[,c(2,3,4)])),
+            melt(cor(dcast(subset(sensis_crossed_plot, sex=='M'), formula = year ~ variable, value.var = 'value')[,c(2,3,4)])))
+imp_corr[1:9, 'sex'] <- 'F'
+imp_corr[10:18, 'sex'] <- 'M'
+
+
+corr_F <- ggplot(data = imp_corr, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile()  +
+  scale_fill_gradient2(midpoint = 0, low = "#52BE80", mid = "white",
+                       high = "#03A9F4", space = "Lab" )+
+  scale_y_discrete('',labels=c('Hump improvements','Senescent improvements','Infant improvements'))+
+  scale_x_discrete('',labels=c('Hump improvements','Senescent improvements','Infant improvements'))+
+  geom_text(aes(Var2, Var1, label = round(value,3)), color = "#5D6D7E", size = 5) +
+  facet_wrap(~ sex)
+
+
+png('corrplot_MAR.png', height=1600, width = 3500, res=250)
+corr_F
+dev.off()
+

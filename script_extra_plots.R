@@ -1,7 +1,7 @@
 # Plot des données ------------------------------
 All_data_male <- data.frame()
 All_data_female<- data.frame()
-for (year in 1960:2017){
+for (year in 2000:2017){
   Data_males_temp <- HMD2MH(country=country_code,year=year, sex='males',path='Data',xtra=TRUE)
   Data_males_temp$year <- year
   All_data_male <- rbind(All_data_male, Data_males_temp)
@@ -64,7 +64,7 @@ xtable(LE_table_latex, type = "latex", file = "filename2.tex")
 
 gap_m <- data.frame()
 gap_f <- data.frame()
-for (year_ in 1960:2017){
+for (year_ in 2000:2017){
   gap_m[as.character(year_),1] <- abs(LE_period_Model(0, year_, SSE_deathrates_male_df) - LE_period_Model(Age = 0, Period = year_, dcast(All_data_male,value.var = 'm', x ~ year)))
   gap_f[as.character(year_),1] <- abs(LE_period_Model(0, year_, SSE_deathrates_female_df) - LE_period_Model(Age = 0, Period = year_, dcast(All_data_female,value.var = 'm', x ~ year)))
   
@@ -85,7 +85,7 @@ gap_plot <- ggplot(gap) + geom_line(aes(x= year, y=V1, group = sex, color =sex))
 
 ex_m <- data.frame()
 ex_f <- data.frame()
-for (year_ in 1960:2017){
+for (year_ in 2000:2017){
   ex_m[as.character(year_),1] <- LE_period_Model(0, year_, SSE_deathrates_male_df) 
   ex_f[as.character(year_),1] <- LE_period_Model(0, year_, SSE_deathrates_female_df)
   
@@ -93,12 +93,12 @@ for (year_ in 1960:2017){
 
 ex_m$var <- c(NA, diff(ex_m$V1))*12
 ex_m$sex <- 'Male'
-ex_m$year <- 1960:2017
+ex_m$year <- 2000:2017
 
 
 ex_f$var <- c(NA, diff(ex_f$V1))*12
 ex_f$sex <- 'Female'
-ex_f$year <- 1960:2017
+ex_f$year <- 2000:2017
 
 
 ex_tot <- rbind(ex_m, ex_f)

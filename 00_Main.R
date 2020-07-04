@@ -126,6 +126,13 @@ png(file = 'lx_plot.png', width = 13, height = 4, units = 'in', res = 600)
 grid.arrange(LX_F, LX_M, nrow=1) 
 dev.off()
 
+
+png('comp_evolution_graphFR.png',  width = 5000, height = 3000, res = 600)
+plot_selectedyears_allComp(c(2000,2017)) + ggtitle('Composantes SSE France en 2000 et 2017') + 
+  scale_color_discrete('Component', labels=c('Infant', 'Senescent', 'Hump', 'All'))
+dev.off()
+
+
 ####################################################################################-
 #--------------------------7. SENSITIVITES  ----------------------------
 ####################################################################################-
@@ -221,38 +228,56 @@ sensis_crossed_var_df <- (sensis_crossed_df[, c('LE_sensisHump','LE_sensisSenesc
 sensis_crossed_var_df$year <- sensis_crossed_df$year
 sensis_crossed_var_df$LE_var <- (sensis_crossed_df$LE_after - sensis_crossed_df$LE_base)*12
 
-#Corrélations ----------
-imp_corr <- melt(cor(dcast(subset(sensis_crossed_plot_5mean, sex=='M'), formula = year ~ variable, value.var = 'value')[,-1]))
-corr <- ggplot(data = imp_corr, aes(x=Var1, y=Var2, fill=value)) + 
-  geom_tile()  +
-  geom_text(aes(Var2, Var1, label = round(value,3)), color = "white", size = 5) 
+#crossed sensis plot ----------
 
-
-png('corrplot.png', height=800, width = 1000, res=150)
-corr
-dev.off()
 
 sensis_crossed_plot_5mean_m  <- melt(aggregate(sensis_crossed_var_df, list(rep(1:(nrow(sensis_crossed_var_df)%/%5+1),each=5,len=nrow(sensis_crossed_var_df))),mean)[-1], id.vars = 'year' )
 sensis_crossed_plot_5mean_m$sex <- 'M'
+sensis_crossed_plot_5mean_m$year <- c(seq(1966,2011, 5), 2017)
 
 sensis_crossed_plot_5mean_f  <- melt(aggregate(sensis_crossed_var_df, list(rep(1:(nrow(sensis_crossed_var_df)%/%5+1),each=5,len=nrow(sensis_crossed_var_df))),mean)[-1], id.vars = 'year' )
 sensis_crossed_plot_5mean_f$sex <- 'F'
+sensis_crossed_plot_5mean_f$year <- seq(1961,2016, 5)
 
 sensis_crossed_plot <- melt(sensis_crossed_var_df, id.vars = 'year' )
 sensis_crossed_plot_5mean <- rbind(sensis_crossed_plot_5mean_f, sensis_crossed_plot_5mean_m)
 
 p1 <- ggplot(subset(sensis_crossed_plot,  variable != 'Senescent')) + geom_line(aes(x= year, y= value, group = variable, color= variable)) + #facet_wrap(~ variable) +
-  ggtitle('Component Yearly Ex improvement ') + ylab('Absolute Ex (months)')
+  ggtitle('Component Yearly Ex improvement ') + ylab('LE improvement (months)')
 
-p2 <- ggplot(sensis_crossed_plot_5mean) + geom_line(aes(x= year, y= value, group = variable, color= variable)) +  facet_wrap(~ sex, nrow=2)+
-  ggtitle('Component 5Y Ex Improvements')+ ylab('Absolute Ex (months)')
+p2 <- ggplot(sensis_crossed_plot_5mean) + geom_line(aes(x= year, y= value, group = variable, color= variable, linetype= variable)) +  facet_wrap(~ sex, nrow=2)+
+  ggtitle('Component 5Y Ex Improvements')+ ylab('LE improvement (months)') +
+  scale_x_continuous(breaks = seq(1961,2016, 5))+
+  scale_linetype_manual('LE Improvement',values = c(1,1,1,2), labels = c('Hump', 'Senescent', 'Infant', 'Total'))+
+  scale_color_discrete('LE Improvement',  labels = c('Hump', 'Senescent', 'Infant', 'Total'))
 
-png('comp_imp.png', width = 5000, height = 4000, res = 500)
+png('comp_imp_FR.png', width = 5000, height = 4000, res = 500)
 p2
 dev.off()
 
 #write.csv(sensis_crossed_df, 'sensis_ex_crossed.csv')
 #ggplot(sensis_crossed_df) + geom_line(aes(x= year, y= val)) #+ facet_wrap(~ variable)
 
+#COrrélations --------
 plot_selectedyears_allComp(c(1965,1966))
 plot_qx_crossedsensis(1965,1966,component = 'senescent')
+
+imp_corr <- rbind(melt(cor(dcast(subset(sensis_crossed_plot_5mean, sex=='F'), formula = year ~ variable, value.var = 'value')[,c(2,3,4)])),
+                  melt(cor(dcast(subset(sensis_crossed_plot_5mean, sex=='M'), formula = year ~ variable, value.var = 'value')[,c(2,3,4)])))
+imp_corr[1:9, 'sex'] <- 'F'
+imp_corr[10:18, 'sex'] <- 'M'
+
+
+corr_F <- ggplot(data = imp_corr, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile()  +
+  scale_fill_gradient2(midpoint = 0, low = "#52BE80", mid = "white",
+                       high = "#03A9F4", space = "Lab" )+
+  scale_y_discrete('',labels=c('Hump improvements','Senescent improvements','Infant improvements'))+
+  scale_x_discrete('',labels=c('Hump improvements','Senescent improvements','Infant improvements'))+
+  geom_text(aes(Var2, Var1, label = round(value,3)), color = "#5D6D7E", size = 5) +
+  facet_wrap(~ sex)
+
+
+png('corrplot_FR.png', height=1600, width = 3500, res=250)
+corr_F
+dev.off()
