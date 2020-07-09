@@ -45,45 +45,9 @@ source('01_Model_Fit.R')
 country_code <-  'FR'
 source('02_Plots.R')
 
-####################################################################################-
-#---------------------------4. SPLINES  ----------------------------
-####################################################################################-
-
-# 4.i Egalite des splines  ----------------------------
-SSE_splines_AllGenders <- merge(SSE_splines_female, SSE_splines_male,by = c('age','splinenb','year'), all=T )
-SSE_splines_AllGenders$Equal <- SSE_splines_AllGenders$splinevalue.x== SSE_splines_AllGenders$splinevalue.y
-if (sum(SSE_splines_AllGenders$Equal) != nrow(SSE_splines_AllGenders)){
-  print("Warning : les splines ne sont pas égales pour les Hommes et les Femmes en tout âge et année")
-}
-
-
-
-# 4.ii Déplacement des splines  ----------------------------
-
-splines_df <- SSE_splines_male[SSE_splines_male$year == 2007,]
-splines_df_cast <- dcast(splines_df, age ~ splinenb,value.var = 'splinevalue')
-splines_df_cast$age <- NULL
-
-max_index = data.frame()
-for ( c in colnames(splines_df_cast)){
-  max_index[c,'ArgMax'] <- match(max(splines_df_cast[,c]),splines_df_cast[,c])
-  max_index[c,'Max'] <- max(splines_df_cast[,c])
-  max_index[c,'SplineNb'] <- as.numeric(c)
-}
-
-max_index [max_index$SplineNb %in% 1:2, 'comp']<-as.character(1)
-max_index[max_index$SplineNb %in% 3:27, 'comp']<-as.character(2)
-max_index[max_index$SplineNb %in% 28:52, 'comp']<-as.character(3)
-
-#Plot de l'âge max et du max par composante et par spline
-ggplot(max_index) + geom_point(aes(x=ArgMax, y=Max,color=comp,shape= comp, size=comp)) +
-  scale_shape_manual(values=c(16, 16, 16)) + scale_size_manual(values=c(8,5,2)) + 
-  scale_color_manual(values = c('#FFD54F','#EA8A75','#7FB3D5'))+
-  scale_x_continuous(breaks = seq(0,110,5))
-
 
 ####################################################################################-
-#---------------------------5. MUHAT COMPUTATION  ----------------------------
+#---------------------------4. MUHAT COMPUTATION  ----------------------------
 ####################################################################################-
 source('05_Functions_Plots.R')
 source('06_Functions_Plots_Females.R')
@@ -147,7 +111,7 @@ source('03_Sensis.R')
 #### Plot of components AND raw data AND Fitted Curve
 plot_allcompRawData(1960)
 
-#ggsave('plot_allfittedComp.pdf', plot_allFittedcomp, height = 6, width =7 )
+
 
 
 #### SENSITIVITY ON COMPONENTS
@@ -258,8 +222,10 @@ dev.off()
 #write.csv(sensis_crossed_df, 'sensis_ex_crossed.csv')
 #ggplot(sensis_crossed_df) + geom_line(aes(x= year, y= val)) #+ facet_wrap(~ variable)
 
-#COrrélations --------
-plot_selectedyears_allComp(c(1965,1966))
+#Corrélations ---------------------------------------
+png('studyppt.png', height=1500, width=1500, res=200)
+plot_selectedyears_allComp(c(2017)) + theme(legend.position = 'none')
+dev.off()
 plot_qx_crossedsensis(1965,1966,component = 'senescent')
 
 imp_corr <- rbind(melt(cor(dcast(subset(sensis_crossed_plot_5mean, sex=='F'), formula = year ~ variable, value.var = 'value')[,c(2,3,4)])),
@@ -281,3 +247,5 @@ corr_F <- ggplot(data = imp_corr, aes(x=Var1, y=Var2, fill=value)) +
 png('corrplot_FR.png', height=1600, width = 3500, res=250)
 corr_F
 dev.off()
+
+
