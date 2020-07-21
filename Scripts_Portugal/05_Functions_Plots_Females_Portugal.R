@@ -15,14 +15,14 @@
 
 plot_allyears_senescent <- function(){
   #PLot du comportement de la mortalité sénescente
-  senescent <- melt(exp(SSE_females$XX$X2%*%(SSE_coeffcients_females_df[3:22,])),varnames = c('Age','Year'),value.name = 'm')
+  senescent <- melt(exp(SSE_females$XX$X2%*%(SSE_coeffcients_females_df[3:27,])),varnames = c('Age','Year'),value.name = 'm')
   senescent$Comp <- '2'
   ggplot(senescent) + geom_line( aes(x=Age, y=m, group=Year, color=Year))+scale_y_continuous(trans='log10') 
 }
 
 plot_allyears_hump <- function(){
   #PLot du comportement de la bosse
-  hump <- melt(exp(SSE_females$XX$X3%*%(SSE_coeffcients_females_df[23:42,])),varnames = c('Age','Year'),value.name = 'm')
+  hump <- melt(exp(SSE_females$XX$X3%*%(SSE_coeffcients_females_df[28:52,])),varnames = c('Age','Year'),value.name = 'm')
   hump$Comp <- '3'
   ggplot(hump) + geom_line( aes(x=Age, y=m, group=Year, color=Year))+scale_y_continuous(trans='log10', limits = c(1e-06, 1)) 
 }
@@ -42,9 +42,9 @@ plot_allyears_infant <- function(){
 }
 
 plot_allyears_qx <- function(){
-  hump <- melt(exp(SSE_females$XX$X3%*%(SSE_coeffcients_females_df[23:42,])),varnames = c('Age','Year'),value.name = 'm')
+  hump <- melt(exp(SSE_females$XX$X3%*%(SSE_coeffcients_females_df[28:52,])),varnames = c('Age','Year'),value.name = 'm')
   hump$Comp <- '3'
-  senescent <- melt(exp(SSE_females$XX$X2%*%(SSE_coeffcients_females_df[3:22,])),varnames = c('Age','Year'),value.name = 'm')
+  senescent <- melt(exp(SSE_females$XX$X2%*%(SSE_coeffcients_females_df[3:27,])),varnames = c('Age','Year'),value.name = 'm')
   senescent$Comp <- '2'
   #PLot du comportement de la mortalité infantile
   infant_qx <- exp(SSE_females$XX$X1%*%(SSE_coeffcients_females_df[1:2,]))
@@ -62,9 +62,9 @@ plot_allyears_qx <- function(){
 }
 
 plot_selectedyears_allComp <- function(Years){
-  hump <- melt(exp(SSE_females$XX$X3%*%(SSE_coeffcients_females_df[23:42,])),varnames = c('Age','Year'),value.name = 'm')
+  hump <- melt(exp(SSE_females$XX$X3%*%(SSE_coeffcients_females_df[28:52,])),varnames = c('Age','Year'),value.name = 'm')
   hump$Comp <- '3'
-  senescent <- melt(exp(SSE_females$XX$X2%*%(SSE_coeffcients_females_df[3:22,])),varnames = c('Age','Year'),value.name = 'm')
+  senescent <- melt(exp(SSE_females$XX$X2%*%(SSE_coeffcients_females_df[3:27,])),varnames = c('Age','Year'),value.name = 'm')
   senescent$Comp <- '2'
   infant_qx <- exp(SSE_females$XX$X1%*%(SSE_coeffcients_females_df[1:2,]))
   infant <- melt(infant_qx,varnames = c('Age','Year'),value.name = 'm')
