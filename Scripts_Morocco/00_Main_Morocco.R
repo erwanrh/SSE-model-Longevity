@@ -40,17 +40,17 @@ source('00_Functions_Calc.R')
 source('Scripts_Morocco/01_Model_Fit_Morocco.R')
 
 ####################################################################################-
-#---------------------------3. PLOTS  ----------------------------
+#---------------------------3. SPLINES / COEFF PLOTS  ----------------------------
 ####################################################################################-
 country_code <-  'MAR'
-source('02_Plots.R')
+source('Scripts_Morocco/02_Plots_Morocco.R')
 
 
 ####################################################################################-
-#---------------------------5. MUHAT COMPUTATION  ----------------------------
+#---------------------------5. COMPONENTS COMPUTATION / PLOTS  ----------------------------
 ####################################################################################-
-source('05_Functions_Plots_Morocco.R')
-source('06_Functions_Plots_Females_Morocco.R')
+source('Scripts_Morocco/05_Functions_Plots_Morocco.R')
+source('Scripts_Morocco/05_Functions_Plots_Females_Morocco.R')
 
 #Plot all years of each component
 plot_allyears_senescent()+  scale_color_gradientn(colours = rainbow(5))
@@ -85,9 +85,12 @@ grid.arrange(gridFemale, gridMale, nrow =1)
 dev.off()
 
 
-#test PLOT SEVERAL YAERS ALL COMPONENTS
-plot_selectedyears_allComp(c(2004,2005, 2006))
 
+
+png('plotcomponentsyears2.png', width= 3500, height=2000, res=400)
+#test PLOT SEVERAL YAERS ALL COMPONENTS
+plot_selectedyears_allComp(c(2000,2001))
+dev.off()
 
 
 ## All plots
@@ -98,10 +101,10 @@ plot_allyears_lx()
 plot_allyears_qx()
 
 
-source('06_Functions_Plots_Females_Morocco.R')
+source('Scripts_Morocco/05_Functions_Plots_Females_Morocco.R')
 LX_F <- plot_selectyears_lx(c(2000,2004,2016)) + ggtitle('Femmes') + theme(legend.position = 'none')
  
-source('05_Functions_Plots_Morocco.R')
+source('Scripts_Morocco/05_Functions_Plots_Morocco.R')
 LX_M <- plot_selectyears_lx(c(2000,2004,2016)) + ggtitle('Hommes')
 
 png(file = 'lx_plot.png', width = 13, height = 4, units = 'in', res = 600)
@@ -110,10 +113,10 @@ dev.off()
 
 
 ####################################################################################-
-#---------------------------8. COMPONENT SENTIVITIES  ----------------------------
+#---------------------------8. COMPONENTS SENSITIVITIES  ----------------------------
 ####################################################################################-
 #Run of sensitivities for EACH components 
-
+ -
 #### Plot of components AND raw data AND Fitted Curve
 plot_allcompRawData(2016)
 
@@ -122,22 +125,25 @@ plot_allcompRawData(2016)
 
 #### SENSITIVITY ON COMPONENTS
 
-source('04_SensisFunctions_Morocco.R')
-source('04_SensisFunctions_Females_Morocco.R')
+source('Scripts_Morocco/04_SensisFunctions_Morocco.R')
+source('Scripts_Morocco/04_SensisFunctions_Females_Morocco.R')
 
 
-#Sensitivités -------------------
+#Sensitivités -
 
 #Fonctions tests
 compute_delta_entropy_sensis(sensis_infant = 0.1, period = 2000)
 compute_delta_entropy_sensis(sensis_infant = 10, period = 2016)
-compute_delta_Ex_sensis(sensis_infant = 100,period = 2017)
+compute_delta_Ex_sensis(sensis_infant = 100,period = 2016)
 plot_lx_sensis(sensis_infant =  100, sensis_hump = 0.1, sensis_senescent = 0)
 plot_qx_sensis(sensis_infant =  100, period = 2015)
 
 
-source('04_SensisFunctions_Morocco.R')
-source('04_SensisFunctions_Females_Morocco.R')
+source('Scripts_Morocco/04_SensisFunctions_Morocco.R')
+source('Scripts_Morocco/04_SensisFunctions_Females_Morocco.R')
+
+
+
 #Dataframe des sensibilités d'ex
 sensis_ex_df <- data.frame()
 sensis_entropy_df <- data.frame()
@@ -154,7 +160,7 @@ for(delta in c(100)){
 }
 
 
-write.csv2(sensis_ex_df, 'sensis_life_expectancy2.csv')
+write.csv(sensis_ex_df, 'sensis_life_expectancy2Mar.csv')
 write.csv2(sensis_entropy_df, 'sensis_entropy.csv')
 #ggsave('plot_allfittedComp_Sensis.pdf', plot_allFittedcomp, height = 6, width =7 )
 
@@ -184,9 +190,9 @@ dev.off()
 
 
 
-# Crossed sensitivities ---------------------------------------------------
-source('04_SensisFunctions_Morocco.R')
-source('04_SensisFunctions_Females_Morocco.R')
+# Crossed sensitivities --
+source('Scripts_Morocco/04_SensisFunctions_Morocco.R')
+source('Scripts_Morocco/04_SensisFunctions_Females_Morocco.R')
 
 sensis_crossed_df<- data.frame()
 for (year in as.numeric(colnames(SSE_deathrates_male_df)[-1])){
@@ -194,12 +200,17 @@ for (year in as.numeric(colnames(SSE_deathrates_male_df)[-1])){
 }
 
 
+write.csv(sensis_crossed_df, 'sensis_life_expectancy2Mar.csv')
+
+#ggsave('plot_allfittedComp_Sensis.pdf', plot_allFittedcomp, height = 6, width =7 )
+
+
 sensis_crossed_var_df <- (sensis_crossed_df[, c('LE_sensisHump','LE_sensisSenescent','LE_sensisInfant')] - sensis_crossed_df$LE_base)*12
 sensis_crossed_var_df$year <- sensis_crossed_df$year
 sensis_crossed_var_df$LE_var <- (sensis_crossed_df$LE_after - sensis_crossed_df$LE_base)*12
 
 
-#Plot crossed sensis ----------
+#Plot crossed sensis
 sensis_crossed_plot_m  <- melt(sensis_crossed_var_df, id.vars = 'year' )
 sensis_crossed_plot_m$sex <- 'M'
 

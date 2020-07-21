@@ -60,13 +60,16 @@ female_senescent <- plot_allyears_senescent() + theme(legend.position = 'none')
 female_hump <- plot_allyears_hump()+ theme(legend.position = 'none')
 gridFemale <- grid.arrange(female_infant, female_senescent, female_hump, ncol=1)
 
+
 male_infant <- plot_allyears_infant() + ggtitle('Male') + theme(legend.position = 'none')
 male_senescent <- plot_allyears_senescent() 
 male_hump <- plot_allyears_hump()+ theme(legend.position = 'none')
 gridMale <- grid.arrange(male_infant, male_senescent, male_hump, ncol=1)
 
-grid.arrange(gridFemale, gridMale, nrow =1)
- 
+
+grid.arrange(gridFemale, gridMale, ncol=2)
+
+
 plot_selectedyears_allComp(c(1965,1966))
 
 grid.arrange(female_qx +  scale_color_gradientn(colours = rainbow(5)),
