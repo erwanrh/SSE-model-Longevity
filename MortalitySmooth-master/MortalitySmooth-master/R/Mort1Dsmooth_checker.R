@@ -39,7 +39,7 @@ Mort1Dsmooth_checker <-function(x, y, offset, w,
   if (length(x)!=length(y)) 
     stop("Arguments must have same length")
   if (length(y) != m | length(offset) != m) 
-    stop("Argument arrays of wrong length")
+    #stop("Argument arrays of wrong length")
   if (deg < 1 | deg >= 10) 
     stop("Wrong value for deg")
   if (pord <= 0 | pord >= 5) 

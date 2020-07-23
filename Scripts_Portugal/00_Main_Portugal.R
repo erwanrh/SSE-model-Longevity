@@ -61,11 +61,9 @@ plot_allyears_infant()+  scale_color_gradientn(colours = rainbow(5))
 #H / M qx plots
 F_qx_plot <- plot_allyears_qx() + ggtitle('Female rates')
 M_qx_plot <- plot_allyears_qx() + ggtitle('Male rates')
-png('MAR_fit_allmx.png', width= 3000, height=2500, res=300)
+png('PRT_fit_allmx.png', width= 3000, height=2500, res=300)
 grid.arrange(F_qx_plot, M_qx_plot)
 dev.off()
-
-
 
 
 # Plot all years all components all sex on ONE PAGE
@@ -94,7 +92,10 @@ dev.off()
 
 
 ## All plots
-grid.arrange(plot_allyears_senescent(), plot_allyears_hump(),plot_allyears_infant(), plot_allyears_qx())
+grid.arrange(plot_allyears_senescent() + scale_color_gradientn(colours = rainbow(5)),
+             plot_allyears_hump() + scale_color_gradientn(colours = rainbow(5)),
+             plot_allyears_infant() + scale_color_gradientn(colours = rainbow(5)),
+             plot_allyears_qx())
 
 #SUrvival function plot
 plot_allyears_lx()
@@ -116,9 +117,9 @@ dev.off()
 #---------------------------8. COMPONENTS SENSITIVITIES  ----------------------------
 ####################################################################################-
 #Run of sensitivities for EACH components 
- -
+ 
 #### Plot of components AND raw data AND Fitted Curve
-plot_allcompRawData(2016)
+plot_allcompRawData(1990)
 
 #ggsave('plot_allfittedComp.pdf', plot_allFittedcomp, height = 6, width =7 )
 
@@ -149,7 +150,7 @@ sensis_ex_df <- data.frame()
 sensis_entropy_df <- data.frame()
 
 for(delta in c(100)){
-  for (year in 2000:2016){
+  for (year in 1980:2017){
     sensis_ex_df[as.character(paste(year,delta, sep = '_')), 'Infant'] <- compute_delta_Ex_sensis(sensis_infant = delta, period = year)*12
     sensis_ex_df[as.character(paste(year,delta, sep = '_')), 'Hump'] <- compute_delta_Ex_sensis(sensis_hump = delta, period = year)*12
     sensis_ex_df[as.character(paste(year,delta, sep = '_')), 'Senescent'] <- compute_delta_Ex_sensis(sensis_senescent = delta, period = year)*12
@@ -172,11 +173,11 @@ sensis_ex_plotdf_f$sex = 'F'
 sensis_ex_plotdf_m <- melt(sensis_ex_df, id.vars = 'year', measure.vars = c('Infant', 'Hump'), value.name = 'Ex')
 sensis_ex_plotdf_m$sex = 'M'
 
-sensis_ex_plotdf <- rbind(sensis_ex_plotdf_f,sensis_ex_plotdf_m)
+sensis_ex_plotdf <- rbind(sensis_ex_plotdf_f)#,sensis_ex_plotdf_m)
 
 #Espérance de vie en stock avec modèle de lissage
 ex_stock_plot <- ggplot(sensis_ex_plotdf,aes(x = year, y= Ex, color= variable),linetype = 1) +
-  facet_wrap(~ sex, ncol = 1) +
+  #facet_wrap(~ sex, ncol = 1) +
   geom_point() +
   geom_smooth( method = 'lm', formula = y ~ x) +
   scale_x_continuous(breaks = c(seq(1960, 2015,5),2017)) + 
@@ -195,12 +196,11 @@ source('Scripts_Portugal/04_SensisFunctions_Portugal.R')
 source('Scripts_Portugal/04_SensisFunctions_Females_Portugal.R')
 
 sensis_crossed_df<- data.frame()
-for (year in as.numeric(colnames(SSE_deathrates_male_df)[-1])){
+for (year in sort(as.numeric(colnames(SSE_deathrates_male_df)))[-1]){
   sensis_crossed_df <- rbind(sensis_crossed_df,cbind(compute_delta_Ex_crossedsensis(period1 = year-1, period2 = year), year))
 }
 
-
-write.csv(sensis_crossed_df, 'sensis_life_expectancy2Mar.csv')
+write.csv(sensis_crossed_df, 'sensis_life_expectancy2PRT.csv')
 
 #ggsave('plot_allfittedComp_Sensis.pdf', plot_allFittedcomp, height = 6, width =7 )
 
@@ -218,24 +218,51 @@ sensis_crossed_plot_f  <- melt(sensis_crossed_var_df, id.vars = 'year' )
 sensis_crossed_plot_f$sex <- 'F'
 
 
-sensis_crossed_plot <- rbind(sensis_crossed_plot_f, sensis_crossed_plot_m)
+sensis_crossed_plot <- rbind(sensis_crossed_plot_f)#, sensis_crossed_plot_m)
 
-p2 <- ggplot(sensis_crossed_plot) + geom_line(aes(x= year, y= value, group = variable, color= variable, linetype= variable)) +  facet_wrap(~ sex, nrow=2)+
+p2 <- ggplot(sensis_crossed_plot) + geom_line(aes(x= year, y= value, group = variable, color= variable, linetype= variable)) +  #facet_wrap(~ sex, nrow=2)+
   ggtitle('Component Yearly Ex Improvements')+ ylab('LE improvement (months)') +
   scale_linetype_manual('LE Improvement',values = c(1,1,1,2), labels = c('Hump', 'Senescent', 'Infant', 'Total'))+
   scale_color_discrete('LE Improvement',  labels = c('Hump', 'Senescent', 'Infant', 'Total'))
 
-png('comp_imp_MAR.png', width = 5000, height = 4000, res = 500)
+png('comp_imp_PRT.png', width = 5000, height = 4000, res = 500)
 p2
 dev.off()
 
 
+################################################ Rolling 5Y AVG on IMPROVEMENTS
+sensis_crossed_rolling5 <- c()
+i<-1
+for (year in 1985:2017){
+  sensis_crossed_rolling5 <- rbind(sensis_crossed_rolling5, 
+                                   colMeans(sensis_crossed_df[sensis_crossed_df$year <= year & sensis_crossed_df$year > year-5, -6]))
+  i <- i+1
+}
 
+sensis_crossed_rolling5 <- as.data.frame(sensis_crossed_rolling5)
+
+sensis_crossed_var5Yroll_df <- (sensis_crossed_rolling5[, c('LE_sensisHump','LE_sensisSenescent','LE_sensisInfant')] - sensis_crossed_rolling5$LE_base)*12
+sensis_crossed_var5Yroll_df$year <- 1985:2017
+sensis_crossed_var5Yroll_df$LE_var <- (sensis_crossed_rolling5$LE_after - sensis_crossed_rolling5$LE_base)*12
+
+
+#Plot crossed sensis
+sensis_crossed5Yrolling_plot  <- melt(sensis_crossed_var5Yroll_df, id.vars = 'year' )
+
+
+p3 <- ggplot(sensis_crossed5Yrolling_plot) + geom_line(aes(x= year, y= value, group = variable, color= variable, linetype= variable)) +  #facet_wrap(~ sex, nrow=2)+
+  ggtitle('Component 5Y rolling average on Yearly Ex Improvements')+ ylab('LE improvement (months)') +
+  scale_linetype_manual('LE Improvement',values = c(1,1,1,2), labels = c('Hump', 'Senescent', 'Infant', 'Total'))+
+  scale_color_discrete('LE Improvement',  labels = c('Hump', 'Senescent', 'Infant', 'Total'))
+
+png('comp_imp5Yroll_PRT.png', width = 5000, height = 4000, res = 500)
+p3
+dev.off()
 
 #write.csv(sensis_crossed_df, 'sensis_ex_crossed.csv')
 #ggplot(sensis_crossed_df) + geom_line(aes(x= year, y= val)) #+ facet_wrap(~ variable)
 
-png('comp_evolution_graph_MAR.png',  width = 5000, height = 3000, res = 600)
+png('comp_evolution_graph_PRT.png',  width = 5000, height = 3000, res = 600)
 plot_selectedyears_allComp(c(2000,2016)) + ggtitle('Composantes SSE Maroc en 2000 et 2016') + 
   scale_color_discrete('Component', labels=c('Infant', 'Senescent', 'Hump', 'All'))
 dev.off()
@@ -259,7 +286,7 @@ corr_F <- ggplot(data = imp_corr, aes(x=Var1, y=Var2, fill=value)) +
   facet_wrap(~ sex)
 
 
-png('corrplot_MAR.png', height=1600, width = 3500, res=250)
+png('corrplot_PRT.png', height=1600, width = 3500, res=250)
 corr_F
 dev.off()
 

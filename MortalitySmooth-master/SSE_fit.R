@@ -94,7 +94,7 @@ morthump <- function(data, model, method = "port", w = 1/data$m, start = NULL, m
   if(model == "sse"){
     
     fit <- sse.fit(data, maxit = maxit, x.hump = x1, x.sen = x2, lambda.sen = lambda.sen, lambda.hump = lambda.hump)
-    attr(fit,"model") <- "sse"
+    
     
   }
   
@@ -693,7 +693,7 @@ MortSmooth_bbase <-  function(x, xl, xr, ndx, deg){
 MortSmooth_tpower <-  function(x, t, p){
     ## Input:
     ## x = abcissae of data
-    (x - t) ^ p * (x > t)
+    (matrix(unlist(x), ncol= length(x)) -  t ) ^ p * (matrix(unlist(x), ncol= length(x)) > t)
     ## (x-t)^p gives the curve
     ## (x>t) is an indicator function; it is 1 when x>t
     ## and 0 when x<=t, i.e. before each knot
