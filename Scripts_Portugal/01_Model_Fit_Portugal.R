@@ -46,11 +46,11 @@ for (year in seq(1980, 2017)){
   if (!any(is.na(Data_males)) & !any(is.na(Data_females)) ){
     #Fit
     print('M', quote = F)
-    SSE_males<- morthump(data=Data_males, model='sse')
+    SSE_males<- morthump(data=Data_males, model='sse', lambda.sen = 5, lambda.hump = 5)
     print('F', quote = F)
     #SSE_females<- morthump(data=Data_females, model='sse')
     
-    
+  
     #Récupération des coefficients alpha
     SSE_coeffcients_males[as.character(year)] <-as.data.frame(as.matrix(coef(SSE_males)))
     #SSE_coeffcients_females[as.character(year)] <- as.data.frame(as.matrix(coef(SSE_females)))
@@ -63,11 +63,11 @@ for (year in seq(1980, 2017)){
     temp_SSE_splines_male <- melt(cbind(SSE_males$XX$X1,SSE_males$XX$X2,SSE_males$XX$X3), value.name = 'splinevalue',varnames = c('age','splinenb'))
     temp_SSE_splines_male$year <- year
     
-    temp_SSE_splines_female <- melt(cbind(SSE_females$XX$X1,SSE_females$XX$X2,SSE_females$XX$X3), value.name = 'splinevalue',varnames = c('age','splinenb'))
-    temp_SSE_splines_female$year <- year
+    #temp_SSE_splines_female <- melt(cbind(SSE_females$XX$X1,SSE_females$XX$X2,SSE_females$XX$X3), value.name = 'splinevalue',varnames = c('age','splinenb'))
+    #temp_SSE_splines_female$year <- year
     
     SSE_splines_male<- rbind(SSE_splines_male,temp_SSE_splines_male)
-    SSE_splines_female<- rbind(SSE_splines_female,temp_SSE_splines_female)
+    #SSE_splines_female<- rbind(SSE_splines_female,temp_SSE_splines_female)
     
     SSE_data_male[as.character(year)] <- as.data.frame(SSE_males$data$m)
     #SSE_data_female[as.character(year)] <-as.data.frame( SSE_females$data$m)
@@ -77,12 +77,12 @@ for (year in seq(1980, 2017)){
 
 # DATA FRAMES Coefficients et Death Rates
 SSE_coeffcients_males_df <- t(data.frame(matrix(unlist(SSE_coeffcients_males), nrow=length(SSE_coeffcients_males), byrow=T),row.names = names(SSE_coeffcients_males)))
-SSE_coeffcients_females_df <- t(data.frame(matrix(unlist(SSE_coeffcients_females), nrow=length(SSE_coeffcients_females), byrow=T),row.names = names(SSE_coeffcients_females)))
-SSE_deathrates_male_df <-  t(data.frame(matrix(unlist(SSE_deathrates_male), nrow=length(SSE_coeffcients_males), byrow=T),row.names = names(SSE_coeffcients_males)))
-SSE_deathrates_female_df <-  t(data.frame(matrix(unlist(SSE_deathrates_female), nrow=length(SSE_coeffcients_females), byrow=T),row.names = names(SSE_coeffcients_females)))
+#SSE_coeffcients_females_df <- t(data.frame(matrix(unlist(SSE_coeffcients_females), nrow=length(SSE_coeffcients_females), byrow=T),row.names = names(SSE_coeffcients_females)))
+SSE_deathrates_male_df <-  t(data.frame(matrix(unlist(SSE_deathrates_male), nrow=length(SSE_coeffcients_males), byrow=T),row.names = names(SSE_coeffcients_males)))#
+#SSE_deathrates_female_df <-  t(data.frame(matrix(unlist(SSE_deathrates_female), nrow=length(SSE_coeffcients_females), byrow=T),row.names = names(SSE_coeffcients_females)))
 SSE_data_male_df <- t(data.frame(matrix(unlist(SSE_data_male), nrow=length(SSE_data_male), byrow=T),row.names = names(SSE_data_male)))
-SSE_data_female_df <- t(data.frame(matrix(unlist(SSE_data_female), nrow=length(SSE_data_female), byrow=T),row.names = names(SSE_data_female)))
+#SSE_data_female_df <- t(data.frame(matrix(unlist(SSE_data_female), nrow=length(SSE_data_female), byrow=T),row.names = names(SSE_data_female)))
 
 row.names(SSE_deathrates_male_df) <- 0:110
-row.names(SSE_deathrates_female_df) <- 0:110
+#row.names(SSE_deathrates_female_df) <- 0:110
 

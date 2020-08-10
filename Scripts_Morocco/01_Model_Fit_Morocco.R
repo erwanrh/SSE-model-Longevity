@@ -29,7 +29,7 @@ SSE_data_female <- list()
 
 
 for (year_ in unique(Data_qx_MAR_All$year)){
-  
+  print(paste0('Fitting year ', year_))
   Data_males <- subset(All_interpolated_data, sex== 'M' & year == year_, select = c('Age', 'qx_male', 'qx_malenx', 'qx_maleqx') )
   colnames(Data_males) <- c('x','d','n','m')
   Data_males <- Data_males[order(Data_males$x),]
@@ -38,8 +38,8 @@ for (year_ in unique(Data_qx_MAR_All$year)){
   colnames(Data_females) <- c('x','d','n','m')
   Data_females <- Data_females[order(Data_females$x),]
 
-  SSE_males<- morthump(data=Data_males, model='sse')
-  SSE_females<- morthump(data=Data_females, model='sse')
+  SSE_males<- morthump(data=Data_males, model='sse', lambda.hump = 1, lambda.sen = 1, x1 = 25)
+  SSE_females<- morthump(data=Data_females, model='sse', lambda.hump = 1, lambda.sen = 1, x1 = 25)
   
   
   #Récupération des coefficients alpha
@@ -50,16 +50,7 @@ for (year_ in unique(Data_qx_MAR_All$year)){
   SSE_deathrates_male[as.character(year_)] <- as.data.frame(SSE_males$mhat$mhat3[,1]+SSE_males$mhat$mhat1[,1]+SSE_males$mhat$mhat2[,1])
   SSE_deathrates_female[as.character(year_)] <- as.data.frame(SSE_females$mhat$mhat3[,1]+SSE_females$mhat$mhat1[,1]+SSE_females$mhat$mhat2[,1])
   
-  #Récupération des composantes
-  temp_SSE_splines_male <- melt(cbind(SSE_males$XX$X1,SSE_males$XX$X2,SSE_males$XX$X3), value.name = 'splinevalue',varnames = c('age','splinenb'))
-  temp_SSE_splines_male$year <- year_
-  
-  temp_SSE_splines_female <- melt(cbind(SSE_females$XX$X1,SSE_females$XX$X2,SSE_females$XX$X3), value.name = 'splinevalue',varnames = c('age','splinenb'))
-  temp_SSE_splines_female$year <- year_
-  
-  SSE_splines_male<- rbind(SSE_splines_male,temp_SSE_splines_male)
-  SSE_splines_female<- rbind(SSE_splines_female,temp_SSE_splines_female)
-  
+
   SSE_data_male[as.character(year_)] <- as.data.frame(SSE_males$data$m)
   SSE_data_female[as.character(year_)] <-as.data.frame( SSE_females$data$m)
   

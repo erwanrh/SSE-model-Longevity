@@ -245,3 +245,54 @@ plot_qx_crossedsensis <- function (period1 = 2000, period2 = 2017, component){
   
   p
 }
+
+
+plot_Ex_by_comp <- function() {
+  sensis_crossed_df<- data.frame()
+  for (year in as.numeric(colnames(SSE_deathrates_male_df)[-1])){
+    sensis_crossed_df <- rbind(sensis_crossed_df,cbind(compute_delta_Ex_crossedsensis(period1 = year-1, period2 = year), year))
+  }
+  
+  
+  #write.csv(sensis_crossed_df, 'sensis_life_expectancy2Mar.csv')
+  #ggsave('plot_allfittedComp_Sensis.pdf', plot_allFittedcomp, height = 6, width =7 )
+  
+  
+  sensis_crossed_var_df <- (sensis_crossed_df[, c('LE_sensisHump','LE_sensisSenescent','LE_sensisInfant')] - sensis_crossed_df$LE_base)*12
+  sensis_crossed_var_df$year <- sensis_crossed_df$year
+  sensis_crossed_var_df$LE_var <- (sensis_crossed_df$LE_after - sensis_crossed_df$LE_base)*12
+  
+  
+  #Plot crossed sensis
+  sensis_crossed_plot_m  <- melt(sensis_crossed_var_df, id.vars = 'year' )
+  sensis_crossed_plot_m$sex <- 'M'
+  
+  sensis_crossed_plot_m
+}
+
+plot_Ex_stock <- function(){
+  #Dataframe des sensibilités d'ex
+  sensis_ex_df <- data.frame()
+  
+  for(delta in c(100)){
+    for (year in 2000:2016){
+      sensis_ex_df[as.character(paste(year,delta, sep = '_')), 'Infant'] <- compute_delta_Ex_sensis(sensis_infant = delta, period = year)*12
+      sensis_ex_df[as.character(paste(year,delta, sep = '_')), 'Hump'] <- compute_delta_Ex_sensis(sensis_hump = delta, period = year)*12
+      sensis_ex_df[as.character(paste(year,delta, sep = '_')), 'Senescent'] <- compute_delta_Ex_sensis(sensis_senescent = delta, period = year)*12
+      sensis_ex_df[as.character(paste(year,delta, sep = '_')), 'variation'] <- delta
+      sensis_ex_df[as.character(paste(year,delta, sep = '_')), 'year'] <- year
+    }
+    
+  }
+
+  #write.csv(sensis_ex_df, 'sensis_life_expectancy2Mar.csv')
+  #write.csv2(sensis_entropy_df, 'sensis_entropy.csv')
+  #ggsave('plot_allfittedComp_Sensis.pdf', plot_allFittedcomp, height = 6, width =7 )
+  
+  
+  #Plot des sensibilités d'ex pour les hommes et les femmes 
+  sensis_ex_plotdf_m <- melt(sensis_ex_df, id.vars = 'year', measure.vars = c('Infant', 'Hump'), value.name = 'Ex')
+  sensis_ex_plotdf_m$sex = 'M'
+  
+  sensis_ex_plotdf_m
+}
