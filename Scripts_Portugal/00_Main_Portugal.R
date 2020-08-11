@@ -145,7 +145,7 @@ source('Scripts_Portugal/04_SensisFunctions_Females_Portugal.R')
 
 
 
-#Dataframe des sensibilités d'ex
+################################  EX EN STOCK  ### 
 sensis_ex_df <- data.frame()
 sensis_entropy_df <- data.frame()
 
@@ -191,7 +191,7 @@ dev.off()
 
 
 
-# Crossed sensitivities --
+################################  EX IMPROVEMENT PAR COMPOSANTE  ### 
 source('Scripts_Portugal/04_SensisFunctions_Portugal.R')
 source('Scripts_Portugal/04_SensisFunctions_Females_Portugal.R')
 

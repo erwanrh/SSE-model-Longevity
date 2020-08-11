@@ -3,7 +3,7 @@ function(x, t, p){
   ## Input:
   ## x = abcissae of data
 
-  (matrix(unlist(x), ncol = length(x)) - t) ^ p * (matrix(unlist(x), ncol = length(x)) > t)
+  (x - t) ^ p * (x > t)
   ## (x-t)^p gives the curve
   ## (x>t) is an indicator function; it is 1 when x>t
   ## and 0 when x<=t, i.e. before each knot

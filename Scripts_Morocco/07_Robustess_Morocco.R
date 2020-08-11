@@ -153,3 +153,55 @@ LE_period_Model(Age = 0, Period = 'm', QxModel = MU_r2 )
 png('robust2MAR.png', width= 3500, height=2000, res=400)
 plot_robust2
 dev.off()
+
+
+####################################################################################-
+#--------------------------- ROBUSTESS 3 ----------------------------
+####################################################################################-
+# But : faire varier une composante pour atteindre 7 mois de gains d'EV
+
+all_components_df <- data.frame()
+sensis_LEvar <- data.frame()
+
+#Coefficient de variation de la composante
+robust_var <- 0
+# Calcul de la courbe avec la variation de composante
+robustness_var_list <- compute_fitted_sensis(period = 2016, sensis_hump = robust_var )
+#Récupération des données avec et sans variation
+robustness_var_df <- robustness_var_list[['df_base']]
+robustness_varsensis_df <- robustness_var_list[['df_sensis']]
+#Dataframe des données
+robustness_var_df$Sensis <- 0
+all_components_df <- rbind(all_components_df, melt(robustness_var_df, id.vars = c('Age', 'Sensis')))
+# Calcul de la variation d'espérance de vie
+delta_LE_robust <-   LE_period_Model(Age = 0, Period = 'FittedCurve', QxModel = robustness_varsensis_df ) -
+  LE_period_Model(Age = 0, Period = 'FittedCurve', QxModel = robustness_var_df  ) 
+delta_LE_robust*12
+
+#Variation de la composante pour atteindre 7 ans d'EV gagnée
+while(delta_LE_robust < 7 ){
+  robust_var <- robust_var + 0.001
+  # Calcul de la courbe avec la variation de composante
+  robustness_var_list <- compute_fitted_sensis(period = 2016, sensis_hump = robust_var )
+  #Récupération des données avec et sans variation
+  robustness_var_df <- robustness_var_list[['df_base']]
+  robustness_varsensis_df <- robustness_var_list[['df_sensis']]
+  #Dataframe des données
+  robustness_varsensis_df$Sensis <- robust_var
+  all_components_df <- rbind(all_components_df, melt(robustness_varsensis_df[, c('Age', 'Sensis', 'Hump', 'FittedCurve')], id.vars = c('Age', 'Sensis')))
+  # Calcul de la variation d'espérance de vie
+  delta_LE_robust <-   (LE_period_Model(Age = 0, Period = 'FittedCurve', QxModel = robustness_varsensis_df ) -
+    LE_period_Model(Age = 0, Period = 'FittedCurve', QxModel = robustness_var_df  ) )*12
+
+  sensis_LEvar[as.character(robust_var),  'LEvar'] <- delta_LE_robust
+  print(delta_LE_robust)
+}
+
+ggplot() + 
+  geom_line(aes(x= Age, y= value, group= variable, linetype = variable), data = subset(all_components_df, Sensis ==0 ))+
+  geom_line(aes(x= Age, y= value, group= Sensis, color = Sensis), data = subset(all_components_df, variable != 'FittedCurve'))+
+  geom_line(aes(x= Age, y= value, group= Sensis, color = Sensis), data = subset(all_components_df, variable == 'FittedCurve'))+
+  ggtitle('Fit 2016 avec Variation de la composante Hump')+
+  scale_y_continuous(trans='log10', limits = c(1e-06, 1))
+
+

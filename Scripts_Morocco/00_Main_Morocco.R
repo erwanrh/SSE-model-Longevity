@@ -37,6 +37,7 @@ source('00_Functions_Calc.R')
 #---------------------------2. FIT  ----------------------------
 ####################################################################################-
 
+source('Scripts_Morocco/00_DataPrep_Morocco.R')
 source('Scripts_Morocco/01_Model_Fit_Morocco.R')
 
 ####################################################################################-
@@ -69,11 +70,13 @@ dev.off()
 
 
 # Plot all years all components all sex on ONE PAGE
+source('Scripts_Morocco/05_Functions_Plots_Females_Morocco.R')
 female_infant <- plot_allyears_infant() + ggtitle('Female') + theme(legend.position = 'none')
 female_senescent <- plot_allyears_senescent() + theme(legend.position = 'none')
 female_hump <- plot_allyears_hump()#+ theme(legend.position = 'none')
 gridFemale <- grid.arrange(female_infant, female_senescent, female_hump, ncol=1)
 
+source('Scripts_Morocco/05_Functions_Plots_Morocco.R')
 male_infant <- plot_allyears_infant() + ggtitle('Male') + theme(legend.position = 'none')
 male_senescent <- plot_allyears_senescent() 
 male_hump <- plot_allyears_hump()+ theme(legend.position = 'none')
@@ -139,42 +142,16 @@ plot_lx_sensis(sensis_infant =  100, sensis_hump = 0.1, sensis_senescent = 0)
 plot_qx_sensis(sensis_infant =  100, period = 2015)
 
 
+
+#Espérance de vie en stock avec modèle de lissage
+
 source('Scripts_Morocco/04_SensisFunctions_Morocco.R')
+sensis_ex_plotdf_m <- plot_Ex_stock()
 source('Scripts_Morocco/04_SensisFunctions_Females_Morocco.R')
-
-
-
-#Dataframe des sensibilités d'ex
-sensis_ex_df <- data.frame()
-sensis_entropy_df <- data.frame()
-
-for(delta in c(100)){
-  for (year in 2000:2016){
-    sensis_ex_df[as.character(paste(year,delta, sep = '_')), 'Infant'] <- compute_delta_Ex_sensis(sensis_infant = delta, period = year)*12
-    sensis_ex_df[as.character(paste(year,delta, sep = '_')), 'Hump'] <- compute_delta_Ex_sensis(sensis_hump = delta, period = year)*12
-    sensis_ex_df[as.character(paste(year,delta, sep = '_')), 'Senescent'] <- compute_delta_Ex_sensis(sensis_senescent = delta, period = year)*12
-    sensis_ex_df[as.character(paste(year,delta, sep = '_')), 'variation'] <- delta
-    sensis_ex_df[as.character(paste(year,delta, sep = '_')), 'year'] <- year
-  }
-  
-}
-
-
-write.csv(sensis_ex_df, 'sensis_life_expectancy2Mar.csv')
-write.csv2(sensis_entropy_df, 'sensis_entropy.csv')
-#ggsave('plot_allfittedComp_Sensis.pdf', plot_allFittedcomp, height = 6, width =7 )
-
-
-#Plot des sensibilités d'ex pour les hommes et les femmes 
-sensis_ex_plotdf_f <- melt(sensis_ex_df, id.vars = 'year', measure.vars = c('Infant', 'Hump'), value.name = 'Ex')
-sensis_ex_plotdf_f$sex = 'F'
-
-sensis_ex_plotdf_m <- melt(sensis_ex_df, id.vars = 'year', measure.vars = c('Infant', 'Hump'), value.name = 'Ex')
-sensis_ex_plotdf_m$sex = 'M'
+sensis_ex_plotdf_f <- plot_Ex_stock()
 
 sensis_ex_plotdf <- rbind(sensis_ex_plotdf_f,sensis_ex_plotdf_m)
 
-#Espérance de vie en stock avec modèle de lissage
 ex_stock_plot <- ggplot(sensis_ex_plotdf,aes(x = year, y= Ex, color= variable),linetype = 1) +
   facet_wrap(~ sex, ncol = 1) +
   geom_point() +
@@ -184,6 +161,8 @@ ex_stock_plot <- ggplot(sensis_ex_plotdf,aes(x = year, y= Ex, color= variable),l
   scale_color_manual(name='Composante',values =  c("#C39BD3", "#5FD69C"), )+
   ylab('Stock LE (months)')
 
+ex_stock_plot 
+
 png('ex_stock.png', height =3000, width = 4000, res = 400)
 ex_stock_plot
 dev.off()
@@ -191,32 +170,12 @@ dev.off()
 
 
 # Crossed sensitivities --
-source('Scripts_Morocco/04_SensisFunctions_Morocco.R')
-source('Scripts_Morocco/04_SensisFunctions_Females_Morocco.R')
-
-sensis_crossed_df<- data.frame()
-for (year in as.numeric(colnames(SSE_deathrates_male_df)[-1])){
-  sensis_crossed_df <- rbind(sensis_crossed_df,cbind(compute_delta_Ex_crossedsensis(period1 = year-1, period2 = year), year))
-}
-
-
-write.csv(sensis_crossed_df, 'sensis_life_expectancy2Mar.csv')
-
-#ggsave('plot_allfittedComp_Sensis.pdf', plot_allFittedcomp, height = 6, width =7 )
-
-
-sensis_crossed_var_df <- (sensis_crossed_df[, c('LE_sensisHump','LE_sensisSenescent','LE_sensisInfant')] - sensis_crossed_df$LE_base)*12
-sensis_crossed_var_df$year <- sensis_crossed_df$year
-sensis_crossed_var_df$LE_var <- (sensis_crossed_df$LE_after - sensis_crossed_df$LE_base)*12
-
 
 #Plot crossed sensis
-sensis_crossed_plot_m  <- melt(sensis_crossed_var_df, id.vars = 'year' )
-sensis_crossed_plot_m$sex <- 'M'
-
-sensis_crossed_plot_f  <- melt(sensis_crossed_var_df, id.vars = 'year' )
-sensis_crossed_plot_f$sex <- 'F'
-
+source('Scripts_Morocco/04_SensisFunctions_Morocco.R')
+sensis_crossed_plot_m  <- plot_Ex_by_comp()
+  source('Scripts_Morocco/04_SensisFunctions_Females_Morocco.R')
+sensis_crossed_plot_f  <- plot_Ex_by_comp()
 
 sensis_crossed_plot <- rbind(sensis_crossed_plot_f, sensis_crossed_plot_m)
 
@@ -224,6 +183,7 @@ p2 <- ggplot(sensis_crossed_plot) + geom_line(aes(x= year, y= value, group = var
   ggtitle('Component Yearly Ex Improvements')+ ylab('LE improvement (months)') +
   scale_linetype_manual('LE Improvement',values = c(1,1,1,2), labels = c('Hump', 'Senescent', 'Infant', 'Total'))+
   scale_color_discrete('LE Improvement',  labels = c('Hump', 'Senescent', 'Infant', 'Total'))
+p2
 
 png('comp_imp_MAR.png', width = 5000, height = 4000, res = 500)
 p2

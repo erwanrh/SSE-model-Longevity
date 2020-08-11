@@ -29,9 +29,9 @@ MAR_qx_plot <- ggplot(Data_qx_MAR_All) +
   scale_shape_manual('', values = c(4)) +
   guides(colour = guide_colourbar(order = 3),shape = guide_legend(order = 2), linetype = guide_legend(order = 1))
 
-png('MAR_qx_interpolated_plot.png', height = 1000, width = 3000, res = 200)
-MAR_qx_plot
-dev.off()
+#png('MAR_qx_interpolated_plot.png', height = 1000, width = 3000, res = 200)
+#MAR_qx_plot
+#dev.off()
 
 
 
@@ -57,9 +57,9 @@ MAR_dx_plot <- ggplot(Data_dx_MAR_All) +
   scale_shape_manual('', values = c(4)) +
   guides(colour = guide_colourbar(order = 3),shape = guide_legend(order = 2), linetype = guide_legend(order = 1))
 
-png('MAR_dx_interpolated_plot.png', height = 1000, width = 3000, res = 200)
-MAR_dx_plot
-dev.off()
+#png('MAR_dx_interpolated_plot.png', height = 1000, width = 3000, res = 200)
+#MAR_dx_plot
+#dev.off()
 
 
 
@@ -81,14 +81,14 @@ MAR_nx_plot <- ggplot(Data_nx_MAR_All) +
   scale_shape_manual('', values = c(4)) +
   guides(colour = guide_colourbar(order = 3),shape = guide_legend(order = 2), linetype = guide_legend(order = 1))
 
-png('MAR_nx_interpolated_plot.png', height = 1000, width = 3000, res = 200)
-MAR_nx_plot
-dev.off()
+#png('MAR_nx_interpolated_plot.png', height = 1000, width = 3000, res = 200)
+#MAR_nx_plot
+#dev.off()
 
 #Final Plot
 
-png('MAR_RAWDATA_interpolated_plot.png', height = 2000, width = 3000, res = 300)
-grid.arrange(MAR_dx_plot, MAR_nx_plot)
-dev.off()
+#png('MAR_RAWDATA_interpolated_plot.png', height = 2000, width = 3000, res = 300)
+#grid.arrange(MAR_dx_plot, MAR_nx_plot)
+#dev.off()
 
 
