@@ -28,8 +28,11 @@ SSE_data_female <- list()
 #FIT du modèle sur chaque année entre 1900 et 2017
 for (year in seq(1960, 2017)){
   print(paste0('Fitting year : ', year, '...'), quote = FALSE) 
+  
   Data_males <- HMD2MH(country=country_code,year=year, sex='males',path='Data',xtra=TRUE)
   Data_females <- HMD2MH(country=country_code,year=year, sex='females',path='Data',xtra=TRUE)
+  
+
   # Expo
   Data_males$n[ Data_males$n==0] <-0.01
   Data_females$n[ Data_females$n==0] <-0.01
@@ -39,12 +42,15 @@ for (year in seq(1960, 2017)){
   #Rates
   Data_females$m[ Data_females$d ==0] <-  0
   Data_males$m[ Data_males$d ==0] <-  0
+
+
+
   
   
   if (!any(is.na(Data_males)) & !any(is.na(Data_females)) ){
     #Fit
-    SSE_males<- morthump(data=Data_males, model='sse')
-    SSE_females<- morthump(data=Data_females, model='sse')
+    try(SSE_males<- morthump(data=Data_males, model='sse', x1 = 25, x2 = 40,lambda.sen = 1), silent = TRUE)
+    try(SSE_females<- morthump(data=Data_females, model='sse',  x1 = 25, x2 = 40, lambda.sen = 1), silent = TRUE)
     
     
     #Récupération des coefficients alpha

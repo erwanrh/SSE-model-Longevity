@@ -249,10 +249,11 @@ plot_qx_crossedsensis <- function (period1 = 2000, period2 = 2017, component){
 
 plot_Ex_by_comp <- function() {
   sensis_crossed_df<- data.frame()
+  year_1 <- as.numeric(colnames(SSE_deathrates_male_df)[1])
   for (year in as.numeric(colnames(SSE_deathrates_male_df)[-1])){
-    sensis_crossed_df <- rbind(sensis_crossed_df,cbind(compute_delta_Ex_crossedsensis(period1 = year-1, period2 = year), year))
+    sensis_crossed_df <- rbind(sensis_crossed_df,cbind(compute_delta_Ex_crossedsensis(period1 = year_1, period2 = year), year))
+    year_1 <- year
   }
-  
   
   #write.csv(sensis_crossed_df, 'sensis_life_expectancy2Mar.csv')
   #ggsave('plot_allfittedComp_Sensis.pdf', plot_allFittedcomp, height = 6, width =7 )

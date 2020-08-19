@@ -11,7 +11,9 @@
 ####################################################################################-
 #------------------------------------  FIT MOROCCO ----------------------------------
 ####################################################################################-
-
+#Import des données brutes du MAROC
+source('Scripts_Morocco/00_DataPrep_Morocco.R')
+#Mise en forme pour le FIT
 All_interpolated_data <- merge(x = merge(x = Data_nx_MAR_All, y = Data_qx_MAR_All, by = c('Age','year','sex'), suffixes = c('nx', 'qx')),
                                y = Data_dx_MAR_All, by = c('Age','year','sex'), suffixes = c('x', 'dx'))
 
@@ -37,9 +39,9 @@ for (year_ in unique(Data_qx_MAR_All$year)){
   Data_females <- subset(All_interpolated_data, sex== 'F' & year == year_, select = c('Age', 'qx_male', 'qx_malenx', 'qx_maleqx') )
   colnames(Data_females) <- c('x','d','n','m')
   Data_females <- Data_females[order(Data_females$x),]
-
-  SSE_males<- morthump(data=Data_males, model='sse', lambda.hump = 1, lambda.sen = 1, x1 = 25)
-  SSE_females<- morthump(data=Data_females, model='sse', lambda.hump = 1, lambda.sen = 1, x1 = 25)
+  
+  try(SSE_males<- morthump(data=Data_males, model='sse', x1 = 25, x2 = 40,lambda.sen = 1), silent = TRUE)
+  try(SSE_females<- morthump(data=Data_females, model='sse',  x1 = 25, x2 = 40, lambda.sen = 1), silent = TRUE)
   
   
   #Récupération des coefficients alpha

@@ -21,7 +21,7 @@ tpx_period <- function(Age,Period, QxModel){ #Calc tpx cohort from qx table ----
 
 
 LE_period_Model <- function(Age,Period, QxModel){ # LE cohort to compare to compute indicators ------------------------------------------------------------------------
-  sum(tpx_period(Age,Period, QxModel),na.rm = TRUE )
+  sum(tpx_period(Age,Period, QxModel),na.rm = TRUE ) +0.5
 }
 
 
