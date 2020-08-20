@@ -14,14 +14,6 @@
 ####################################################################################-
 
 
-plot_DeathRatesFitted <- function(){
-
-
-}
-
-#To save the plot
-#ggsave(paste0('drplot_',country_code,'.pdf'),Plot_DeathRatesFitted,width = 20, height = 12)
-
 
 plot_AlphasFitted <- function() {
   
@@ -104,7 +96,7 @@ plot_allyears_hump <- function(){
 
 
 plot_allyears_infant <- function(){
-  #Plot du comportement de la mortalité infantile
+  #Plot du comportement de la mortalit? infantile
   infantM <- melt(exp(SSE_males$XX$X1%*%(SSE_coeffcients_males_df[1:2,])),varnames = c('Age','Year'),value.name = 'm')
   infantM$Comp <- '1'
   infantM$sex <- 'M'

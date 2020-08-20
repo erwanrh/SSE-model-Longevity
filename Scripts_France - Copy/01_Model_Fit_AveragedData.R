@@ -27,13 +27,13 @@ SSE_data_female <- list()
 
 
 #FIT du modèle sur chaque année entre 1900 et 2017
-for (year in year_min:year_max){
+for (year in (year_min+5):year_max){
   print(paste0('Fitting year : ', year, '...'), quote = FALSE) 
 
   Data_males <- c()
   Data_females <- c()
   
-  for (year2 in seq(year, year+5)){
+  for (year2 in seq(year-5, year)){
     Data_males <- rbind(Data_males, HMD2MH(country=country_code, year=year2, sex='males', path='Data', xtra=TRUE))
     Data_females <- rbind(Data_females, HMD2MH(country=country_code,year=year2, sex='females',path='Data',xtra=TRUE))
     # Expo

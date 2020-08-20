@@ -43,7 +43,7 @@ source('Scripts_France/01_Model_Fit.R')
 #---------------------------3. PLOTS  ----------------------------
 ####################################################################################-
 country_code <-  'FR'
-source('Scripts_France/02_Plots.R')
+source('Scripts_France - Copy/02_Plots.R')
 
 
 ####################################################################################-
@@ -66,18 +66,6 @@ grid.arrange(plot_allyears_senescent(), plot_allyears_hump(),plot_allyears_infan
 #SUrvival function plot
 plot_allyears_lx()
 plot_allyears_qx()
-
-
-source('06_Functions_Plots_Females.R')
-LX_F <- plot_selectyears_lx(c(1960,2017)) + ggtitle('Femmes') + theme(legend.position = 'none')+
-  annotate("segment", x = 77, xend = 87.5 ,y = 50000, yend = 50000,  size=0.5, arrow=arrow())
-source('05_Functions_Plots.R')
-LX_M <- plot_selectyears_lx(c(1960,2017)) + ggtitle('Hommes') +
-  annotate("segment", x = 70, xend = 82, y = 50000, yend = 50000,  size=0.5, arrow=arrow())
-
-png(file = 'lx_plot.png', width = 13, height = 4, units = 'in', res = 600)
-grid.arrange(LX_F, LX_M, nrow=1) 
-dev.off()
 
 
 png('comp_evolution_graphFR.png',  width = 5000, height = 3000, res = 600)

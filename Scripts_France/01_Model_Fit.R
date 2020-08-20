@@ -54,7 +54,7 @@ for (year in seq(1960, 2017)){
     
     
     #Récupération des coefficients alpha
-    SSE_coeffcients_males[as.character(year)] <-as.data.frame(as.matrix(coef(SSE_males)))
+    SSE_coeffcients_males[as.character(year)] <-as.data.frame(attr(coef(SSE_males), which = 'x'))
     SSE_coeffcients_females[as.character(year)] <- as.data.frame(as.matrix(coef(SSE_females)))
     
     #Récupération des taux fittés
